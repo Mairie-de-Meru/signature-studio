@@ -540,7 +540,21 @@ function openBankPreview(img, btn) {
 function closeBankPreview() {
   $("#bank-preview").classList.add("is-hidden");
   selectedBankImage = null;
-  $$(".bank-item").forEach((el) => el.classList.remove("is-selected"));}
+  $$(".bank-item").forEach((el) => el.classList.remove("is-selected"));
+}
+
+function openZoom(src, alt) {
+  const layer = $("#zoom-layer");
+  const im = $("#zoom-img");
+  im.src = src;
+  im.alt = alt || "";
+  layer.classList.remove("is-hidden");
+}
+
+function closeZoom() {
+  $("#zoom-layer").classList.add("is-hidden");
+  $("#zoom-img").src = "";
+}
 
 function handleImportFile(file) {
   if (!file) return;
@@ -655,6 +669,11 @@ function bindEvents() {
   });
 
   $("#preview-signature").addEventListener("click", (e) => {
+    const img = e.target.closest("img");
+    if (img && img.getAttribute("src")) {
+      openZoom(img.currentSrc || img.src, img.alt);
+      return;
+    }
     const target = e.target.closest("[data-edit]");
     if (!target) return;
     e.preventDefault();
@@ -683,6 +702,10 @@ function bindEvents() {
     e.target.value = "";
   });
   $("#bank-preview-close").addEventListener("click", closeBankPreview);
+
+  $("#zoom-close").addEventListener("click", closeZoom);
+  $("#zoom-layer").addEventListener("click", (e) => { if (e.target.id === "zoom-layer") closeZoom(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeZoom(); });
 
   $$("[data-use-as]").forEach((btn) => {
     btn.addEventListener("click", () => {
