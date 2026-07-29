@@ -460,32 +460,6 @@ fieldset > legend .switch { margin-left: auto; }
   color: var(--c-text-soft);
 }
 
-/* ===================== Preview toolbar ===================== */
-.preview-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-3);
-  margin-bottom: var(--sp-3);
-}
-.toggle-group {
-  display: inline-flex;
-  gap: 2px;
-  padding: 3px;
-  background: var(--c-surface-2);
-  border: 1px solid var(--c-border);
-  border-radius: var(--r-pill);
-}
-.toggle-group .btn {
-  border: none;
-  background: transparent;
-  padding: 0.35rem 0.7rem;
-  font-size: 0.8rem;
-  box-shadow: none;
-  color: var(--c-text-soft);
-}
-.toggle-group .btn:hover { background: var(--c-surface); }
-.toggle-group .btn.is-active { background: var(--c-accent); color: #fff; }
-
 /* ===================== Email frame ===================== */
 .email-frame {
   border: 1px solid var(--c-border);

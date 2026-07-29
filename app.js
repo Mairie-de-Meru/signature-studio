@@ -780,19 +780,6 @@ function bindEvents() {
     }
   });
 
-  const frame = $("#email-frame");
-  $("#btn-bg-light").addEventListener("click", () => setToggle(frame, "bg-light", "bg-dark", "#btn-bg-light", "#btn-bg-dark"));
-  $("#btn-bg-dark").addEventListener("click", () => setToggle(frame, "bg-dark", "bg-light", "#btn-bg-dark", "#btn-bg-light"));
-  $("#btn-dev-desktop").addEventListener("click", () => setToggle(frame, "device-desktop", "device-mobile", "#btn-dev-desktop", "#btn-dev-mobile"));
-  $("#btn-dev-mobile").addEventListener("click", () => setToggle(frame, "device-mobile", "device-desktop", "#btn-dev-mobile", "#btn-dev-desktop"));
-
-  function setToggle(el, addCls, removeCls, activeBtn, inactiveBtn) {
-    el.classList.add(addCls);
-    el.classList.remove(removeCls);
-    $(activeBtn).classList.add("is-active");
-    $(inactiveBtn).classList.remove("is-active");
-  }
-
   $("#import-file").addEventListener("change", (e) => {
     handleImportFile(e.target.files[0]);
     e.target.value = "";
