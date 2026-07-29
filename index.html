@@ -175,6 +175,44 @@
         </fieldset>
 
         <fieldset>
+          <legend>Texte sur la bannière</legend>
+          <p class="hint">Incrustez un titre et un sous-titre directement dans l'image bannière.</p>
+          <div class="field-row">
+            <label for="f-bannerTitle">Titre</label>
+            <input type="text" id="f-bannerTitle" data-field="bannerTitle" placeholder="Ville de Meru">
+          </div>
+          <div class="field-row">
+            <label for="f-bannerSubtitle">Sous-titre</label>
+            <input type="text" id="f-bannerSubtitle" data-field="bannerSubtitle" placeholder="Accueil · État civil · Culture">
+          </div>
+          <div class="field-row">
+            <label for="s-bannerTextColor">Couleur</label>
+            <input type="color" id="s-bannerTextColor" data-style="bannerTextColor" title="Couleur du texte de la bannière.">
+          </div>
+          <div class="field-row range-row">
+            <label for="s-bannerTextSize">Taille</label>
+            <input type="range" id="s-bannerTextSize" data-style="bannerTextSize" min="12" max="40" step="1">
+            <output for="s-bannerTextSize" id="out-bannerTextSize">22px</output>
+          </div>
+          <div class="field-row">
+            <label for="s-bannerPos">Position</label>
+            <select id="s-bannerPos" data-style="bannerPos">
+              <option value="top">Haut</option>
+              <option value="center">Centre</option>
+              <option value="bottom">Bas</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <label for="s-bannerAlign">Alignement</label>
+            <select id="s-bannerAlign" data-style="bannerAlign">
+              <option value="left">Gauche</option>
+              <option value="center">Centré</option>
+              <option value="right">Droite</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <fieldset>
           <legend>Mention légale
             <input type="checkbox" class="switch" data-show="legal" checked aria-label="Afficher la mention" title="Afficher / masquer">
           </legend>

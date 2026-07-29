@@ -365,6 +365,17 @@ fieldset > legend .switch { margin-left: auto; }
   box-shadow: 0 0 0 3px var(--c-accent-soft);
 }
 
+.field-row input[type="color"] {
+  flex: 0 0 auto;
+  width: 48px;
+  height: 38px;
+  padding: 2px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-sm);
+  background: var(--c-surface);
+  cursor: pointer;
+}
+
 .field-row input.is-invalid {
   border-color: var(--c-danger);
   box-shadow: 0 0 0 3px var(--c-danger-soft);

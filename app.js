@@ -27,6 +27,8 @@ const DEFAULT_STATE = {
     photo: "assets/images/avatars/avatar-1.svg",
     logo: "assets/images/entreprise/logo-entreprise.svg",
     banner: "assets/images/bannieres/banniere-1.svg",
+    bannerTitle: "",
+    bannerSubtitle: "",
     linkedin: "https://www.linkedin.com/in/camille-durand",
     instagram: "https://www.instagram.com/lumeastudio",
     facebook: "",
@@ -43,7 +45,8 @@ const DEFAULT_STATE = {
     font: "Arial, Helvetica, sans-serif",
     fontSize: 13, nameSize: 17,
     primary: "#1a5fb4", secondary: "#5b6e84", text: "#333333",
-    align: "left", spacing: 6, photoSize: 72, logoSize: 100, iconSize: 22
+    align: "left", spacing: 6, photoSize: 72, logoSize: 100, iconSize: 22,
+    bannerTextColor: "#ffffff", bannerTextSize: 22, bannerPos: "center", bannerAlign: "center"
   }
 };
 
@@ -93,6 +96,8 @@ function mergeDefaults(target, defaults) {
 let state = loadState();
 let importedImages = loadImports();
 let saveTimer = null;
+let bannerComposite = null;
+let bannerCompositeWarned = false;
 
 function loadState() {
   try {
@@ -181,8 +186,9 @@ function buildParts(st, exportMode) {
   parts.logo = (v.logo && d.logo)
     ? `<img${at("logo")} src="${esc(img("logo"))}" alt="Logo ${esc(d.company) || "entreprise"}" width="${ls}" style="display:block;width:${ls}px;height:auto;max-width:180px;">`
     : "";
-  parts.banner = (v.banner && d.banner)
-    ? `<img${at("banner")} src="${esc(img("banner"))}" alt="Bannière ${esc(d.company) || "promotionnelle"}" width="480" style="display:block;width:100%;max-width:480px;height:auto;border-radius:4px;">`
+  const bannerSrc = getBannerSrc(exportMode);
+  parts.banner = (v.banner && bannerSrc)
+    ? `<img${at("banner")} src="${esc(bannerSrc)}" alt="Bannière ${esc(d.company) || "promotionnelle"}" width="480" style="display:block;width:100%;max-width:480px;height:auto;border-radius:4px;">`
     : "";
 
   parts.legal = (v.legal && d.legal)
@@ -311,6 +317,7 @@ function renderAll() {
   renderTemplateList();
   renderImageSlots();
   renderWarnings();
+  updateBannerComposite();
 }
 
 function renderPreview() {
@@ -341,7 +348,96 @@ function renderImageSlots() {
   const setImg = (id, val) => { const el = $(id); if (el) el.src = val || ""; };
   setImg("#slot-photo", state.data.photo);
   setImg("#slot-logo", state.data.logo);
-  setImg("#slot-banner", state.data.banner);
+  setImg("#slot-banner", getBannerSrc(false));
+}
+
+function getBannerSrc(exportMode) {
+  const hasText = (state.data.bannerTitle || "").trim() || (state.data.bannerSubtitle || "").trim();
+  if (hasText && bannerComposite) return bannerComposite;
+  const base = state.data.banner;
+  return exportMode ? resolveImgUrl(base) : base;
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const im = new Image();
+    im.crossOrigin = "anonymous";
+    im.onload = () => resolve(im);
+    im.onerror = reject;
+    im.src = src;
+  });
+}
+
+function drawCover(ctx, im, W, H) {
+  const ir = im.naturalWidth / im.naturalHeight;
+  const cr = W / H;
+  let dw, dh, dx, dy;
+  if (ir > cr) { dh = H; dw = H * ir; dx = (W - dw) / 2; dy = 0; }
+  else { dw = W; dh = W / ir; dx = 0; dy = (H - dh) / 2; }
+  ctx.drawImage(im, dx, dy, dw, dh);
+}
+
+function drawBannerText(ctx, W, H) {
+  const s = state.style;
+  const title = (state.data.bannerTitle || "").trim();
+  const sub = (state.data.bannerSubtitle || "").trim();
+  if (!title && !sub) return;
+  const align = s.bannerAlign || "center";
+  const pos = s.bannerPos || "center";
+  const titleSize = Number(s.bannerTextSize) || 22;
+  const subSize = Math.max(10, Math.round(titleSize * 0.6));
+  const color = s.bannerTextColor || "#ffffff";
+  const gap = Math.round(titleSize * 0.18);
+  const totalH = (title ? titleSize : 0) + (sub ? subSize + gap : 0);
+  const y = pos === "top" ? 14 + totalH / 2 : pos === "bottom" ? H - 14 - totalH / 2 : H / 2;
+  const x = align === "left" ? 18 : align === "right" ? W - 18 : W / 2;
+  ctx.textBaseline = "middle";
+  ctx.textAlign = align;
+  ctx.shadowColor = "rgba(0,0,0,0.35)";
+  ctx.shadowBlur = 4;
+  if (title) {
+    ctx.font = "bold " + titleSize + "px " + s.font;
+    ctx.fillStyle = color;
+    ctx.fillText(title, x, y - totalH / 2 + titleSize / 2);
+  }
+  if (sub) {
+    ctx.font = subSize + "px " + s.font;
+    ctx.fillStyle = color;
+    ctx.fillText(sub, x, y + totalH / 2 - subSize / 2);
+  }
+  ctx.shadowBlur = 0;
+}
+
+async function updateBannerComposite() {
+  const hasText = (state.data.bannerTitle || "").trim() || (state.data.bannerSubtitle || "").trim();
+  bannerComposite = null;
+  if (!hasText) { renderPreview(); return; }
+  const base = state.data.banner ? resolveImgUrl(state.data.banner) : null;
+  const W = 480;
+  let H = 120;
+  let im = null;
+  if (base) {
+    try { im = await loadImage(base); }
+    catch { im = null; }
+  }
+  const canvas = document.createElement("canvas");
+  if (im) H = Math.max(60, Math.round(W * im.naturalHeight / im.naturalWidth));
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  if (im) drawCover(ctx, im, W, H);
+  else { ctx.fillStyle = "#eef1f6"; ctx.fillRect(0, 0, W, H); }
+  drawBannerText(ctx, W, H);
+  try {
+    bannerComposite = canvas.toDataURL("image/png");
+  } catch {
+    bannerComposite = null;
+    if (!bannerCompositeWarned) {
+      bannerCompositeWarned = true;
+      showToast("Aperçu bannière indisponible sur ce navigateur.", "error");
+    }
+  }
+  renderPreview();
 }
 
 function renderWarnings() {
