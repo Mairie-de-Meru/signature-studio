@@ -1,28 +1,18 @@
-/* =========================================================================
- * Signature Studio — app.js
- * Application 100 % statique : HTML5 + CSS3 + JavaScript natif.
- *
- * Organisation du fichier :
- *   1. Configuration (état par défaut, modèles, réseaux sociaux)
- *   2. Utilitaires (échappement, validation, etc.)
- *   3. État central + sauvegarde/restauration localStorage
- *   4. Génération du HTML compatible e-mail (tableaux + styles en ligne)
- *   5. Rendu de l'interface (aperçu, vignettes, avertissements…)
- *   6. Banque d'images (JSON + secours JS, import local, aperçu)
- *   7. Export (copie, sélection manuelle, code HTML, téléchargement)
- *   8. Liaison des événements et démarrage
- * ========================================================================= */
-
 "use strict";
 
-/* =======================================================================
- * 1. CONFIGURATION
- * ===================================================================== */
-
-const STORAGE_KEY = "signature-studio:state:v1";
+const STORAGE_KEY = "signature-studio:state:v2";
 const IMPORTS_KEY = "signature-studio:imports:v1";
 
-/** Données de démonstration : l'interface est testable immédiatement. */
+const BASE_URL = window.location.origin +
+  (window.location.pathname.replace(/\/[^/]*$/, '/') || '/');
+
+function resolveImgUrl(path) {
+  if (!path) return "";
+  if (/^https?:\/\//i.test(path)) return path;
+  if (/^data:/i.test(path)) return path;
+  return BASE_URL + path.replace(/^\.?\//, '');
+}
+
 const DEFAULT_STATE = {
   template: "classique",
   data: {
@@ -44,29 +34,19 @@ const DEFAULT_STATE = {
     youtube: "",
     legal: "🌱 Pensez à l'environnement : n'imprimez ce message que si nécessaire."
   },
-  /* Visibilité individuelle de chaque information. */
   show: {
     photo: true, logo: true, banner: true,
     role: true, company: true, phone: true, email: true,
     website: true, address: true, social: true, legal: true
   },
-  /* Personnalisation visuelle. */
   style: {
     font: "Arial, Helvetica, sans-serif",
-    fontSize: 13,
-    nameSize: 17,
-    primary: "#1f5fbf",
-    secondary: "#5b6673",
-    text: "#333333",
-    align: "left",
-    spacing: 6,
-    photoSize: 72,
-    logoSize: 100,
-    iconSize: 22
+    fontSize: 13, nameSize: 17,
+    primary: "#1a5fb4", secondary: "#5b6e84", text: "#333333",
+    align: "left", spacing: 6, photoSize: 72, logoSize: 100, iconSize: 22
   }
 };
 
-/** Réseaux sociaux : pastilles colorées compatibles e-mail (pas d'images). */
 const SOCIAL_NETWORKS = [
   { key: "linkedin",  label: "LinkedIn",  short: "in", color: "#0A66C2" },
   { key: "instagram", label: "Instagram", short: "Ig", color: "#E4405F" },
@@ -75,23 +55,16 @@ const SOCIAL_NETWORKS = [
   { key: "youtube",   label: "YouTube",   short: "YT", color: "#FF0000" }
 ];
 
-/* =======================================================================
- * 2. UTILITAIRES
- * ===================================================================== */
-
-/** Échappe le HTML des saisies utilisateur. */
 function esc(str) {
   return String(str || "")
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-/** Vérifie une adresse e-mail (contrôle simple mais suffisant). */
 function isValidEmail(v) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
 }
 
-/** Vérifie qu'une URL est absolue et analysable. */
 function isValidUrl(v) {
   try {
     const u = new URL(v.trim());
@@ -99,14 +72,12 @@ function isValidUrl(v) {
   } catch { return false; }
 }
 
-/** Rend une URL absolue (préfixe https:// si besoin) pour l'export. */
 function absUrl(v) {
   const t = String(v || "").trim();
   if (!t) return "";
   return /^https?:\/\//i.test(t) ? t : "https://" + t;
 }
 
-/** Fusion profonde simple : complète `target` avec les clés de `defaults`. */
 function mergeDefaults(target, defaults) {
   const out = { ...defaults };
   for (const k of Object.keys(target || {})) {
@@ -119,29 +90,24 @@ function mergeDefaults(target, defaults) {
   return out;
 }
 
-/* =======================================================================
- * 3. ÉTAT CENTRAL + PERSISTANCE
- * ===================================================================== */
-
 let state = loadState();
-let importedImages = loadImports(); // [{ file: dataURL, alt, name }]
+let importedImages = loadImports();
 let saveTimer = null;
 
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return mergeDefaults(JSON.parse(raw), DEFAULT_STATE);
-  } catch { /* stockage indisponible : on continue en mémoire */ }
+  } catch {}
   return structuredClone(DEFAULT_STATE);
 }
 
-/** Sauvegarde différée (évite d'écrire à chaque frappe). */
 function saveState() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-    catch { showToast("Impossible d'enregistrer localement (stockage plein ou bloqué).", "error"); }
-  }, 250);
+    catch { showToast("Impossible d'enregistrer localement.", "error"); }
+  }, 300);
 }
 
 function loadImports() {
@@ -151,32 +117,24 @@ function loadImports() {
 
 function saveImports() {
   try { localStorage.setItem(IMPORTS_KEY, JSON.stringify(importedImages)); }
-  catch { showToast("Image importée trop lourde pour être conservée après fermeture.", "error"); }
+  catch { showToast("Image trop lourde pour être conservée.", "error"); }
 }
 
-/** Met à jour l'état puis rafraîchit tout ce qui en dépend. */
 function updateState(mutator) {
   mutator(state);
   saveState();
   renderAll();
 }
 
-/* =======================================================================
- * 4. GÉNÉRATION DU HTML COMPATIBLE E-MAIL
- *    Règles : tableaux, styles en ligne, pas de JS/formulaire/animation,
- *    polices web-safe, attributs alt, liens absolus.
- * ===================================================================== */
-
-/** Construit les « briques » réutilisées par tous les modèles. */
-function buildParts(st, editable) {
+function buildParts(st, exportMode) {
   const d = st.data, s = st.style, v = st.show;
-  // Attribut d'édition WYSIWYG : présent uniquement dans l'aperçu.
-  const at = (k) => (editable ? ` data-edit="${k}"` : "");
+  const at = (k) => (exportMode ? "" : ` data-edit="${k}"`);
   const base = `font-family:${s.font};font-size:${s.fontSize}px;color:${s.text};line-height:1.5;`;
   const link = `color:${s.primary};text-decoration:none;`;
   const fullName = [d.firstName, d.lastName].filter(Boolean).join(" ");
+  const img = (k) => exportMode ? resolveImgUrl(d[k]) : d[k];
 
-  const parts = { at, base, link, fullName, d, s, v };
+  const parts = { at, base, link, fullName, d, s, v, img };
 
   parts.name = `<span${at("firstName")} style="font-family:${s.font};font-size:${s.nameSize}px;font-weight:bold;color:${s.primary};">${esc(fullName)}</span>`;
 
@@ -186,7 +144,6 @@ function buildParts(st, editable) {
   parts.company = (v.company && d.company)
     ? `<span${at("company")} style="font-family:${s.font};font-size:${s.fontSize}px;font-weight:bold;color:${s.secondary};">${esc(d.company)}</span>` : "";
 
-  // Lignes de coordonnées (chacune masquable).
   const contact = [];
   if (v.phone && d.phone) {
     contact.push(`<a${at("phone")} href="tel:${esc(d.phone.replace(/[^+\d]/g, ""))}" style="${base}${link}">${esc(d.phone)}</a>`);
@@ -201,14 +158,9 @@ function buildParts(st, editable) {
     contact.push(`<span${at("address")} style="${base}">${esc(d.address)}</span>`);
   }
   parts.contactList = contact;
-  /** Coordonnées empilées (une par ligne). */
-  parts.contactBlock = contact
-    .map((c) => `<div style="padding-top:2px;">${c}</div>`).join("");
-  /** Coordonnées sur une ligne, séparées par des puces. */
-  parts.contactInline = contact
-    .join(`<span style="${base}color:${s.secondary};">&nbsp;&nbsp;&bull;&nbsp;&nbsp;</span>`);
+  parts.contactBlock = contact.map((c) => `<div style="padding-top:2px;">${c}</div>`).join("");
+  parts.contactInline = contact.join(`<span style="${base}color:${s.secondary};">&nbsp;&nbsp;&bull;&nbsp;&nbsp;</span>`);
 
-  // Pastilles réseaux sociaux (tableau : fiable dans tous les clients mail).
   const activeSocial = SOCIAL_NETWORKS.filter((n) => v.social && d[n.key]);
   parts.social = activeSocial.length
     ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0"${at("linkedin")} style="border-collapse:collapse;"><tr>` +
@@ -222,15 +174,15 @@ function buildParts(st, editable) {
       `</tr></table>`
     : "";
 
-  // Images (attributs alt systématiques).
+  const ps = s.photoSize, ls = s.logoSize;
   parts.photo = (v.photo && d.photo)
-    ? `<img${at("photo")} src="${esc(d.photo)}" alt="Photo de ${esc(fullName) || "profil"}" width="${s.photoSize}" height="${s.photoSize}" style="display:block;width:${s.photoSize}px;height:${s.photoSize}px;border-radius:50%;object-fit:cover;">`
+    ? `<img${at("photo")} src="${esc(img("photo"))}" alt="Photo de ${esc(fullName) || "profil"}" width="${ps}" height="${ps}" style="display:block;width:${ps}px;height:${ps}px;border-radius:50%;object-fit:cover;">`
     : "";
   parts.logo = (v.logo && d.logo)
-    ? `<img${at("logo")} src="${esc(d.logo)}" alt="Logo ${esc(d.company) || "de l'entreprise"}" width="${s.logoSize}" style="display:block;width:${s.logoSize}px;height:auto;">`
+    ? `<img${at("logo")} src="${esc(img("logo"))}" alt="Logo ${esc(d.company) || "entreprise"}" width="${ls}" style="display:block;width:${ls}px;height:auto;max-width:180px;">`
     : "";
   parts.banner = (v.banner && d.banner)
-    ? `<img${at("banner")} src="${esc(d.banner)}" alt="Bannière ${esc(d.company) || "promotionnelle"}" width="480" style="display:block;width:100%;max-width:480px;height:auto;border-radius:4px;">`
+    ? `<img${at("banner")} src="${esc(img("banner"))}" alt="Bannière ${esc(d.company) || "promotionnelle"}" width="480" style="display:block;width:100%;max-width:480px;height:auto;border-radius:4px;">`
     : "";
 
   parts.legal = (v.legal && d.legal)
@@ -240,11 +192,6 @@ function buildParts(st, editable) {
   return parts;
 }
 
-/**
- * Modèles de signature.
- * Pour AJOUTER UN MODÈLE : dupliquez une entrée, changez `label`
- * et la fonction `render(p)` qui reçoit les briques de buildParts().
- */
 const TEMPLATES = {
   classique: {
     label: "Classique",
@@ -265,7 +212,6 @@ ${p.legal ? `<tr><td colspan="2" style="padding-top:${pad + 4}px;text-align:${s.
 </table>`;
     }
   },
-
   moderne: {
     label: "Moderne",
     render(p) {
@@ -287,7 +233,6 @@ ${p.legal ? `<tr><td style="padding-top:${pad + 4}px;text-align:${s.align};">${p
 </table>`;
     }
   },
-
   compact: {
     label: "Compact",
     render(p) {
@@ -304,7 +249,6 @@ ${p.legal ? `<div style="padding-top:${pad + 2}px;">${p.legal}</div>` : ""}
 </td></tr></table>`;
     }
   },
-
   banniere: {
     label: "Avec bannière",
     render(p) {
@@ -328,13 +272,11 @@ ${p.legal ? `<tr><td style="padding-top:${pad + 2}px;text-align:${s.align};">${p
   }
 };
 
-/** Génère le HTML de la signature (aperçu si editable, export sinon). */
-function buildSignatureHtml(st, { editable = false } = {}) {
+function buildSignatureHtml(st, { export: exp = false } = {}) {
   const tpl = TEMPLATES[st.template] || TEMPLATES.classique;
-  return tpl.render(buildParts(st, editable));
+  return tpl.render(buildParts(st, exp));
 }
 
-/** Version texte brut (utilisée pour le presse-papiers). */
 function buildPlainText(st) {
   const d = st.data, v = st.show;
   const lines = [
@@ -347,33 +289,23 @@ function buildPlainText(st) {
   return lines.filter(Boolean).join("\n");
 }
 
-/** Document HTML complet pour le téléchargement. */
 function buildEmailDocument(st) {
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Signature e-mail — ${esc([st.data.firstName, st.data.lastName].filter(Boolean).join(" "))}</title>
-<!--
-  Signature générée par Signature Studio.
-  IMPORTANT : hébergez les images publiquement (https://…) et remplacez
-  les chemins locaux ou data: avant d'installer la signature.
--->
 </head>
 <body>
-${buildSignatureHtml(st)}
+${buildSignatureHtml(st, { export: true })}
 </body>
 </html>`;
 }
 
-/* =======================================================================
- * 5. RENDU DE L'INTERFACE
- * ===================================================================== */
-
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
-/** Rafraîchit tout ce qui dépend de l'état. */
 function renderAll() {
   renderPreview();
   renderTemplateList();
@@ -382,10 +314,9 @@ function renderAll() {
 }
 
 function renderPreview() {
-  $("#preview-signature").innerHTML = buildSignatureHtml(state, { editable: true });
+  $("#preview-signature").innerHTML = buildSignatureHtml(state);
 }
 
-/** Vignettes des modèles : mini-aperçus réels réduits par transformation. */
 function renderTemplateList() {
   const list = $("#template-list");
   list.innerHTML = "";
@@ -396,8 +327,8 @@ function renderTemplateList() {
     card.className = "template-card" + (selected ? " is-selected" : "");
     card.setAttribute("role", "radio");
     card.setAttribute("aria-checked", String(selected));
-    card.title = "Changer de modèle ne supprime aucune information saisie.";
-    const mini = { ...state, template: id };
+    card.title = tpl.label;
+    const mini = { ...state, template: id, show: { ...state.show }, data: { ...state.data }, style: { ...state.style } };
     card.innerHTML =
       `<div class="tpl-thumb" aria-hidden="true"><div class="tpl-thumb-inner">${buildSignatureHtml(mini)}</div></div>` +
       `<span class="tpl-name">${tpl.label}</span>`;
@@ -406,17 +337,15 @@ function renderTemplateList() {
   }
 }
 
-/** Met à jour les miniatures photo / logo / bannière du formulaire. */
 function renderImageSlots() {
   $("#slot-photo").src = state.data.photo || "";
   $("#slot-logo").src = state.data.logo || "";
   $("#slot-banner").src = state.data.banner || "";
 }
 
-/** Validation : champs incomplets, liens invalides, images non hébergées. */
 function renderWarnings() {
   const d = state.data, v = state.show;
-  const warnings = []; // { text, level: "error"|"info", field }
+  const warnings = [];
 
   $$("#signature-form input").forEach((i) => i.classList.remove("is-invalid"));
 
@@ -424,56 +353,43 @@ function renderWarnings() {
     warnings.push({ text: "Renseignez au moins un prénom ou un nom.", level: "error", field: "firstName" });
   }
   if (v.email && d.email && !isValidEmail(d.email)) {
-    warnings.push({ text: "L'adresse e-mail semble invalide.", level: "error", field: "email" });
+    warnings.push({ text: "Format d'email invalide.", level: "error", field: "email" });
   }
   if (v.website && d.website && !isValidUrl(absUrl(d.website))) {
-    warnings.push({ text: "L'URL du site web semble invalide.", level: "error", field: "website" });
+    warnings.push({ text: "URL du site web invalide.", level: "error", field: "website" });
   }
   for (const n of SOCIAL_NETWORKS) {
     if (v.social && d[n.key] && !isValidUrl(absUrl(d[n.key]))) {
-      warnings.push({ text: `Le lien ${n.label} semble invalide.`, level: "error", field: n.key });
+      warnings.push({ text: `URL ${n.label} invalide.`, level: "error", field: n.key });
     }
   }
 
-  // Champs affichés mais vides = incomplets (simple information).
   const missing = [];
   if (v.email && !d.email) missing.push("e-mail");
   if (v.phone && !d.phone) missing.push("téléphone");
   if (v.role && !d.role) missing.push("fonction");
   if (v.company && !d.company) missing.push("entreprise");
   if (missing.length) {
-    warnings.push({ text: "Champs affichés mais incomplets : " + missing.join(", ") + ".", level: "info" });
-  }
-
-  // Images locales ou intégrées : rappel d'hébergement public.
-  const localImgs = ["photo", "logo", "banner"].filter(
-    (k) => v[k] && d[k] && !/^https?:\/\//i.test(d[k])
-  );
-  if (localImgs.length) {
-    warnings.push({
-      text: "Images non hébergées publiquement (" + localImgs.join(", ") +
-        ") : elles risquent de ne pas s'afficher chez vos destinataires. Hébergez-les en https:// (voir README).",
-      level: "info"
-    });
+    warnings.push({ text: "Champs affichés mais vides : " + missing.join(", ") + ".", level: "info" });
   }
 
   const box = $("#warnings");
-  box.innerHTML = warnings.length
-    ? warnings.map((w) =>
-        `<div class="warning-item${w.level === "info" ? " is-info" : ""}">${w.level === "info" ? "ℹ️" : "⚠️"} ${esc(w.text)}</div>`
-      ).join("")
-    : `<span class="warnings-ok">✓ Aucun problème détecté.</span>`;
+  if (warnings.length) {
+    box.innerHTML = warnings.map((w) =>
+      `<div class="warning-item${w.level === "info" ? " is-info" : ""}">${w.level === "info" ? "ℹ️" : "⚠️"} ${esc(w.text)}</div>`
+    ).join("");
+  } else {
+    box.innerHTML = `<span class="warnings-ok">✓ Aucun problème détecté.</span>`;
+  }
 
-  // Marque visuellement les champs en erreur.
   for (const w of warnings) {
     if (w.level === "error" && w.field) {
-      const input = document.querySelector(`[data-field="${w.field}"]`);
-      if (input) { input.classList.add("is-invalid"); input.setAttribute("aria-invalid", "true"); }
+      const inp = document.querySelector(`[data-field="${w.field}"]`);
+      if (inp) { inp.classList.add("is-invalid"); inp.setAttribute("aria-invalid", "true"); }
     }
   }
 }
 
-/** Reporte l'état dans les champs du formulaire (au chargement / reset). */
 function syncFormFromState() {
   $$("[data-field]").forEach((el) => { el.value = state.data[el.dataset.field] ?? ""; });
   $$("[data-show]").forEach((el) => { el.checked = state.show[el.dataset.show] !== false; });
@@ -483,36 +399,76 @@ function syncFormFromState() {
   });
 }
 
-/** Affiche la valeur des curseurs (ex. « 13 px »). */
 function updateRangeOutput(el) {
   if (el.type !== "range") return;
   const out = document.getElementById("out-" + el.dataset.style);
-  if (out) out.textContent = el.value + " px";
+  if (out) out.textContent = el.value + "px";
+}
+
+function updateCopyBtn(text, type) {
+  const btn = $("#btn-copy");
+  const orig = btn.innerHTML;
+  btn.innerHTML = text;
+  btn.className = "btn btn-" + type + " btn-copied";
+  setTimeout(() => { btn.innerHTML = orig; btn.className = "btn btn-primary"; }, 1500);
 }
 
 let toastTimer = null;
-/** Message clair après copie, téléchargement ou erreur. */
 function showToast(message, type = "success") {
   const t = $("#toast");
   t.textContent = message;
   t.className = "toast is-" + type;
-  t.hidden = false;
+  t.removeAttribute("hidden");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.hidden = true; }, 3500);
+  toastTimer = setTimeout(() => { t.setAttribute("hidden", ""); }, 3500);
 }
 
-/* =======================================================================
- * 6. BANQUE D'IMAGES
- * ===================================================================== */
+const TPL_COLORS = {
+  classique: { primary: "#1a5fb4", secondary: "#5b6e84", text: "#333333" },
+  moderne:   { primary: "#1f8f74", secondary: "#5a7a6b", text: "#2a3a33" },
+  compact:   { primary: "#7a3fa8", secondary: "#6a5a7a", text: "#333333" },
+  banniere:  { primary: "#c2571f", secondary: "#7a6a5a", text: "#333333" }
+};
+
+function applyTemplateColors(tplId) {
+  const c = TPL_COLORS[tplId];
+  if (!c) return;
+  updateState((s) => {
+    s.style.primary = c.primary;
+    s.style.secondary = c.secondary;
+    s.style.text = c.text;
+  });
+  syncFormFromState();
+}
+
+function showModal(title, message, onConfirm) {
+  const layer = $("#modal-layer");
+  layer.innerHTML = `<div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-box">
+      <h3 id="modal-title">${esc(title)}</h3>
+      <p>${esc(message)}</p>
+      <div class="modal-actions">
+        <button type="button" class="btn" id="modal-cancel">Annuler</button>
+        <button type="button" class="btn btn-danger" id="modal-confirm">Confirmer</button>
+      </div>
+    </div>
+  </div>`;
+  layer.hidden = false;
+  const close = () => { layer.innerHTML = ""; layer.hidden = true; };
+  $("#modal-cancel").addEventListener("click", close);
+  $("#modal-confirm").addEventListener("click", () => { close(); onConfirm(); });
+  layer.querySelector(".modal-overlay").addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) close();
+  });
+}
 
 let imageBank = { categories: [] };
 let currentCategory = "entreprise";
-let selectedBankImage = null; // { file, alt }
+let selectedBankImage = null;
 
-/** Charge images.json ; en cas de blocage (file://), utilise images-data.js. */
 async function loadImageBank() {
   try {
-    const res = await fetch("assets/images.json");
+    const res = await fetch(BASE_URL + "assets/images.json");
     if (!res.ok) throw new Error("HTTP " + res.status);
     imageBank = await res.json();
   } catch {
@@ -522,13 +478,12 @@ async function loadImageBank() {
   renderBankGrid();
 }
 
-/** Catégories = celles du JSON + « Mes imports ». */
 function getBankCategories() {
   const cats = imageBank.categories.slice();
   cats.push({
     id: "imports",
     label: "Mes imports",
-    description: "Images importées depuis votre ordinateur (stockées localement).",
+    description: "Images importées depuis votre ordinateur.",
     images: importedImages
   });
   return cats;
@@ -571,7 +526,6 @@ function renderBankGrid() {
   }
 }
 
-/** Aperçu avant utilisation. */
 function openBankPreview(img, btn) {
   selectedBankImage = img;
   $$(".bank-item").forEach((el) => el.classList.remove("is-selected"));
@@ -582,11 +536,16 @@ function openBankPreview(img, btn) {
   $("#bank-preview").hidden = false;
 }
 
-/** Import d'une image depuis l'ordinateur (convertie en données locales). */
+function closeBankPreview() {
+  $("#bank-preview").hidden = true;
+  selectedBankImage = null;
+  $$(".bank-item").forEach((el) => el.classList.remove("is-selected"));
+}
+
 function handleImportFile(file) {
   if (!file) return;
   if (file.size > 400 * 1024) {
-    showToast("Image trop lourde (max 400 Ko conseillé pour une signature).", "error");
+    showToast("Image trop lourde (max 400 Ko).", "error");
     return;
   }
   const reader = new FileReader();
@@ -598,19 +557,14 @@ function handleImportFile(file) {
     renderBankTabs();
     renderBankGrid();
     openBankPreview(entry);
-    showToast("Image importée. Choisissez son usage dans l'aperçu.", "success");
+    showToast("Image importée. Choisissez son usage.", "success");
   };
   reader.onerror = () => showToast("Impossible de lire ce fichier.", "error");
   reader.readAsDataURL(file);
 }
 
-/* =======================================================================
- * 7. EXPORT
- * ===================================================================== */
-
-/** Copie la signature mise en forme (HTML + texte brut). */
 async function copySignature() {
-  const html = buildSignatureHtml(state);
+  const html = buildSignatureHtml(state, { export: true });
   const plain = buildPlainText(state);
   try {
     await navigator.clipboard.write([
@@ -619,26 +573,25 @@ async function copySignature() {
         "text/plain": new Blob([plain], { type: "text/plain" })
       })
     ]);
+    updateCopyBtn("✓ Copiée !", "primary");
     showToast("Signature copiée ! Collez-la dans les réglages de votre messagerie.", "success");
   } catch {
-    // Secours : copie via sélection de l'aperçu.
     if (copyBySelection()) {
+      updateCopyBtn("✓ Copiée !", "primary");
       showToast("Signature copiée (méthode de secours).", "success");
     } else {
       selectSignature();
-      showToast("Copie automatique impossible : signature sélectionnée, faites Ctrl+C / Cmd+C.", "error");
+      showToast("Copie automatique impossible. Faites Ctrl+C / Cmd+C.", "error");
     }
   }
 }
 
-/** Sélectionne l'aperçu et tente execCommand('copy'). */
 function copyBySelection() {
   selectSignature();
   try { return document.execCommand("copy"); }
   catch { return false; }
 }
 
-/** Solution de secours : sélection manuelle de la signature. */
 function selectSignature() {
   const node = $("#preview-signature");
   const range = document.createRange();
@@ -649,25 +602,22 @@ function selectSignature() {
   node.focus();
 }
 
-/** Copie le code HTML brut. */
 async function copyHtmlCode() {
-  const html = buildSignatureHtml(state);
+  const html = buildSignatureHtml(state, { export: true });
   try {
     await navigator.clipboard.writeText(html);
     showToast("Code HTML copié.", "success");
   } catch {
-    // Secours : zone de texte temporaire.
     const ta = document.createElement("textarea");
     ta.value = html;
     document.body.appendChild(ta);
     ta.select();
     const ok = document.execCommand("copy");
     ta.remove();
-    showToast(ok ? "Code HTML copié." : "Copie impossible dans ce navigateur.", ok ? "success" : "error");
+    showToast(ok ? "Code HTML copié." : "Copie impossible.", ok ? "success" : "error");
   }
 }
 
-/** Télécharge le fichier signature.html. */
 function downloadHtml() {
   const blob = new Blob([buildEmailDocument(state)], { type: "text/html;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -681,26 +631,19 @@ function downloadHtml() {
   showToast("Fichier signature.html téléchargé.", "success");
 }
 
-/* =======================================================================
- * 8. ÉVÉNEMENTS + DÉMARRAGE
- * ===================================================================== */
-
 function bindEvents() {
-  // --- Formulaire : informations ---
   $$("[data-field]").forEach((el) => {
     el.addEventListener("input", () => {
       updateState((s) => { s.data[el.dataset.field] = el.value; });
     });
   });
 
-  // --- Formulaire : visibilité ---
   $$("[data-show]").forEach((el) => {
     el.addEventListener("change", () => {
       updateState((s) => { s.show[el.dataset.show] = el.checked; });
     });
   });
 
-  // --- Formulaire : style ---
   $$("[data-style]").forEach((el) => {
     el.addEventListener("input", () => {
       updateRangeOutput(el);
@@ -711,11 +654,10 @@ function bindEvents() {
     });
   });
 
-  // --- Édition WYSIWYG : cliquer un élément de l'aperçu focalise son champ ---
   $("#preview-signature").addEventListener("click", (e) => {
     const target = e.target.closest("[data-edit]");
     if (!target) return;
-    e.preventDefault(); // évite de suivre les liens dans l'aperçu
+    e.preventDefault();
     const input = document.querySelector(`[data-field="${target.dataset.edit}"]`);
     if (input) {
       input.scrollIntoView({ block: "center", behavior: "smooth" });
@@ -723,11 +665,9 @@ function bindEvents() {
     }
   });
 
-  // --- Aperçu : fond clair / sombre ---
   const frame = $("#email-frame");
   $("#btn-bg-light").addEventListener("click", () => setToggle(frame, "bg-light", "bg-dark", "#btn-bg-light", "#btn-bg-dark"));
   $("#btn-bg-dark").addEventListener("click", () => setToggle(frame, "bg-dark", "bg-light", "#btn-bg-dark", "#btn-bg-light"));
-  // --- Aperçu : ordinateur / mobile ---
   $("#btn-dev-desktop").addEventListener("click", () => setToggle(frame, "device-desktop", "device-mobile", "#btn-dev-desktop", "#btn-dev-mobile"));
   $("#btn-dev-mobile").addEventListener("click", () => setToggle(frame, "device-mobile", "device-desktop", "#btn-dev-mobile", "#btn-dev-desktop"));
 
@@ -738,57 +678,56 @@ function bindEvents() {
     $(inactiveBtn).classList.remove("is-active");
   }
 
-  // --- Banque d'images ---
   $("#import-file").addEventListener("change", (e) => {
     handleImportFile(e.target.files[0]);
-    e.target.value = ""; // permet de réimporter le même fichier
+    e.target.value = "";
   });
-  $("#bank-preview-close").addEventListener("click", () => {
-    $("#bank-preview").hidden = true;
-    selectedBankImage = null;
-    $$(".bank-item").forEach((el) => el.classList.remove("is-selected"));
-  });
+  $("#bank-preview-close").addEventListener("click", closeBankPreview);
+
   $$("[data-use-as]").forEach((btn) => {
     btn.addEventListener("click", () => {
       if (!selectedBankImage) return;
-      const slot = btn.dataset.useAs; // photo | logo | banner
+      const slot = btn.dataset.useAs;
       updateState((s) => {
         s.data[slot] = selectedBankImage.file;
         s.show[slot] = true;
       });
       syncFormFromState();
+      closeBankPreview();
       const labels = { photo: "photo", logo: "logo", banner: "bannière" };
       showToast(`Image appliquée comme ${labels[slot]}.`, "success");
     });
   });
 
-  // --- Export ---
   $("#btn-copy").addEventListener("click", copySignature);
   $("#btn-select").addEventListener("click", () => {
     selectSignature();
-    showToast("Signature sélectionnée : copiez avec Ctrl+C / Cmd+C.", "success");
+    showToast("Signature sélectionnée. Copiez avec Ctrl+C / Cmd+C.", "success");
   });
   $("#btn-copy-html").addEventListener("click", copyHtmlCode);
   $("#btn-download").addEventListener("click", downloadHtml);
 
-  // --- Réinitialisations ---
   $("#btn-reset-style").addEventListener("click", () => {
     updateState((s) => { s.style = structuredClone(DEFAULT_STATE.style); });
     syncFormFromState();
     showToast("Style réinitialisé.", "success");
   });
   $("#btn-reset-all").addEventListener("click", () => {
-    if (!confirm("Effacer toutes les informations et personnalisations ?")) return;
-    localStorage.removeItem(STORAGE_KEY);
-    state = structuredClone(DEFAULT_STATE);
-    saveState();
-    syncFormFromState();
-    renderAll();
-    showToast("Application réinitialisée avec les données de démonstration.", "success");
+    showModal(
+      "Tout effacer ?",
+      "Toutes les informations et personnalisations seront perdues. Cette action est irréversible.",
+      () => {
+        localStorage.removeItem(STORAGE_KEY);
+        state = structuredClone(DEFAULT_STATE);
+        saveState();
+        syncFormFromState();
+        renderAll();
+        showToast("Application réinitialisée.", "success");
+      }
+    );
   });
 }
 
-/* --- Démarrage --- */
 document.addEventListener("DOMContentLoaded", () => {
   syncFormFromState();
   bindEvents();

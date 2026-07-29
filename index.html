@@ -4,62 +4,58 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Signature Studio — Créateur de signatures e-mail</title>
-  <meta name="description" content="Concevez et exportez des signatures e-mail professionnelles, sans serveur ni installation.">
+  <meta name="description" content="Concevez et exportez des signatures e-mail professionnelles. Application 100% statique, sans serveur ni installation.">
+  <meta name="theme-color" content="#1a5fb4">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
   <header class="app-header">
     <h1>✒️ Signature Studio</h1>
-    <p class="tagline">Concevez, personnalisez et exportez votre signature e-mail professionnelle.</p>
+    <p class="tagline">Concevez votre signature e-mail professionnelle</p>
     <div class="header-actions">
       <button type="button" id="btn-reset-style" class="btn btn-ghost"
-              title="Remet la police, les couleurs et les tailles par défaut, sans toucher à vos informations.">
-        Réinitialiser le style
+              title="Remet la police, les couleurs et les espacements par défaut sans perdre vos informations.">
+        ↺ Style
       </button>
       <button type="button" id="btn-reset-all" class="btn btn-ghost btn-danger"
-              title="Efface toutes les informations et personnalisations enregistrées.">
-        Tout réinitialiser
+              title="Efface toutes les données et personnalisations.">
+        ✕ Tout effacer
       </button>
     </div>
   </header>
 
   <main class="layout">
 
-    <!-- ================= ZONE 1 : modèles + banque d'images ================= -->
     <section class="panel panel-left" aria-labelledby="titre-modeles">
       <h2 id="titre-modeles">1. Modèle</h2>
-      <div id="template-list" class="template-list" role="radiogroup" aria-label="Choix du modèle de signature">
-        <!-- Vignettes générées par app.js -->
-      </div>
+      <div id="template-list" class="template-list" role="radiogroup" aria-label="Choix du modèle de signature"></div>
 
       <h2 id="titre-banque">Banque d'images</h2>
-      <p class="hint">Cliquez sur une image pour la prévisualiser, puis choisissez son usage.</p>
+      <p class="hint">Cliquez sur une image pour la prévisualiser.</p>
       <nav id="bank-tabs" class="bank-tabs" aria-label="Catégories d'images"></nav>
       <div id="bank-grid" class="bank-grid" aria-live="polite"></div>
 
       <div class="bank-import">
-        <label for="import-file" class="btn btn-secondary" title="Importer une image (PNG, JPG, SVG, GIF) depuis votre ordinateur. Elle sera intégrée en données locales.">
-          📁 Importer une image…
+        <label for="import-file" class="btn btn-secondary btn-small" title="Importer une image depuis votre ordinateur (PNG, JPG, SVG, GIF, WebP).">
+          + Importer
         </label>
         <input type="file" id="import-file" accept="image/png,image/jpeg,image/svg+xml,image/gif,image/webp" hidden>
       </div>
 
-      <!-- Aperçu avant utilisation -->
       <div id="bank-preview" class="bank-preview" hidden>
-        <h3>Aperçu de l'image</h3>
+        <h3>Aperçu</h3>
         <img id="bank-preview-img" src="" alt="Aperçu de l'image sélectionnée">
         <p id="bank-preview-name" class="hint"></p>
         <div class="bank-preview-actions">
-          <button type="button" class="btn btn-small" data-use-as="photo">Utiliser comme photo</button>
-          <button type="button" class="btn btn-small" data-use-as="logo">Utiliser comme logo</button>
-          <button type="button" class="btn btn-small" data-use-as="banner">Utiliser comme bannière</button>
+          <button type="button" class="btn btn-small" data-use-as="photo">📷 Photo</button>
+          <button type="button" class="btn btn-small" data-use-as="logo">🏷️ Logo</button>
+          <button type="button" class="btn btn-small" data-use-as="banner">🖼️ Bannière</button>
           <button type="button" class="btn btn-small btn-ghost" id="bank-preview-close">Fermer</button>
         </div>
       </div>
     </section>
 
-    <!-- ================= ZONE 2 : formulaire de personnalisation ================= -->
     <section class="panel panel-center" aria-labelledby="titre-perso">
       <h2 id="titre-perso">2. Personnalisation</h2>
 
@@ -78,12 +74,12 @@
           <div class="field-row">
             <label for="f-role">Fonction</label>
             <input type="text" id="f-role" data-field="role" placeholder="Directrice Marketing">
-            <input type="checkbox" data-show="role" checked aria-label="Afficher la fonction" title="Afficher / masquer">
+            <input type="checkbox" data-show="role" checked aria-label="Afficher la fonction" title="Afficher/masquer">
           </div>
           <div class="field-row">
             <label for="f-company">Entreprise</label>
             <input type="text" id="f-company" data-field="company" placeholder="Lumea Studio">
-            <input type="checkbox" data-show="company" checked aria-label="Afficher l'entreprise" title="Afficher / masquer">
+            <input type="checkbox" data-show="company" checked aria-label="Afficher l'entreprise" title="Afficher/masquer">
           </div>
         </fieldset>
 
@@ -92,28 +88,28 @@
           <div class="field-row">
             <label for="f-phone">Téléphone</label>
             <input type="tel" id="f-phone" data-field="phone" placeholder="+33 6 12 34 56 78">
-            <input type="checkbox" data-show="phone" checked aria-label="Afficher le téléphone" title="Afficher / masquer">
+            <input type="checkbox" data-show="phone" checked aria-label="Afficher le téléphone" title="Afficher/masquer">
           </div>
           <div class="field-row">
             <label for="f-email">E-mail</label>
             <input type="email" id="f-email" data-field="email" placeholder="prenom.nom@entreprise.fr">
-            <input type="checkbox" data-show="email" checked aria-label="Afficher l'e-mail" title="Afficher / masquer">
+            <input type="checkbox" data-show="email" checked aria-label="Afficher l'e-mail" title="Afficher/masquer">
           </div>
           <div class="field-row">
             <label for="f-website">Site web</label>
             <input type="url" id="f-website" data-field="website" placeholder="https://www.entreprise.fr">
-            <input type="checkbox" data-show="website" checked aria-label="Afficher le site web" title="Afficher / masquer">
+            <input type="checkbox" data-show="website" checked aria-label="Afficher le site web" title="Afficher/masquer">
           </div>
           <div class="field-row">
             <label for="f-address">Adresse</label>
             <input type="text" id="f-address" data-field="address" placeholder="12 rue des Lilas, 75011 Paris">
-            <input type="checkbox" data-show="address" checked aria-label="Afficher l'adresse" title="Afficher / masquer">
+            <input type="checkbox" data-show="address" checked aria-label="Afficher l'adresse" title="Afficher/masquer">
           </div>
         </fieldset>
 
         <fieldset>
           <legend>Réseaux sociaux
-            <input type="checkbox" data-show="social" checked aria-label="Afficher les réseaux sociaux" title="Afficher / masquer tous les réseaux">
+            <input type="checkbox" data-show="social" checked aria-label="Afficher les réseaux sociaux" title="Afficher/masquer tous">
           </legend>
           <div class="field-row">
             <label for="f-linkedin">LinkedIn</label>
@@ -139,30 +135,30 @@
 
         <fieldset>
           <legend>Images</legend>
-          <p class="hint">Choisissez les images dans la banque d'images (zone 1), puis « Utiliser comme… ».</p>
+          <p class="hint">Sélectionnez une image dans la banque (zone 1), puis « Utiliser comme… ».</p>
           <div class="field-row image-slot">
             <span class="label">Photo</span>
             <img id="slot-photo" class="slot-thumb" src="" alt="Photo actuelle">
-            <input type="checkbox" data-show="photo" checked aria-label="Afficher la photo" title="Afficher / masquer">
+            <input type="checkbox" data-show="photo" checked aria-label="Afficher la photo" title="Afficher/masquer">
           </div>
           <div class="field-row image-slot">
             <span class="label">Logo</span>
             <img id="slot-logo" class="slot-thumb" src="" alt="Logo actuel">
-            <input type="checkbox" data-show="logo" checked aria-label="Afficher le logo" title="Afficher / masquer">
+            <input type="checkbox" data-show="logo" checked aria-label="Afficher le logo" title="Afficher/masquer">
           </div>
           <div class="field-row image-slot">
             <span class="label">Bannière</span>
             <img id="slot-banner" class="slot-thumb slot-thumb-wide" src="" alt="Bannière actuelle">
-            <input type="checkbox" data-show="banner" checked aria-label="Afficher la bannière" title="Afficher / masquer (utilisée par le modèle « Bannière »)">
+            <input type="checkbox" data-show="banner" checked aria-label="Afficher la bannière" title="Afficher/masquer">
           </div>
         </fieldset>
 
         <fieldset>
-          <legend>Mention légale / environnementale
-            <input type="checkbox" data-show="legal" checked aria-label="Afficher la mention légale" title="Afficher / masquer">
+          <legend>Mention
+            <input type="checkbox" data-show="legal" checked aria-label="Afficher la mention" title="Afficher/masquer">
           </legend>
           <div class="field-row">
-            <textarea id="f-legal" data-field="legal" rows="2" aria-label="Texte légal ou environnemental"
+            <textarea id="f-legal" data-field="legal" rows="2"
               placeholder="Ex. : Pensez à l'environnement avant d'imprimer ce message."></textarea>
           </div>
         </fieldset>
@@ -171,7 +167,7 @@
           <legend>Style</legend>
           <div class="field-row">
             <label for="s-font">Police</label>
-            <select id="s-font" data-style="font" title="Polices « web-safe », affichées correctement dans tous les logiciels de messagerie.">
+            <select id="s-font" data-style="font" title="Polices compatibles avec tous les logiciels de messagerie.">
               <option value="Arial, Helvetica, sans-serif">Arial</option>
               <option value="Helvetica, Arial, sans-serif">Helvetica</option>
               <option value="Verdana, Geneva, sans-serif">Verdana</option>
@@ -183,26 +179,22 @@
             </select>
           </div>
           <div class="field-row">
-            <label for="s-fontSize">Taille du texte</label>
+            <label for="s-fontSize">Texte</label>
             <input type="range" id="s-fontSize" data-style="fontSize" min="10" max="18" step="1">
-            <output for="s-fontSize" id="out-fontSize">13 px</output>
+            <output for="s-fontSize" id="out-fontSize">13px</output>
           </div>
           <div class="field-row">
-            <label for="s-nameSize">Taille du nom</label>
+            <label for="s-nameSize">Nom</label>
             <input type="range" id="s-nameSize" data-style="nameSize" min="13" max="26" step="1">
-            <output for="s-nameSize" id="out-nameSize">17 px</output>
+            <output for="s-nameSize" id="out-nameSize">17px</output>
           </div>
-          <div class="field-row">
-            <label for="s-primary">Couleur principale</label>
+          <div class="field-row" style="grid-template-columns:1fr 1fr 1fr">
+            <label for="s-primary" style="font-size:0.78rem;color:var(--c-muted)">Principale</label>
+            <label for="s-secondary" style="font-size:0.78rem;color:var(--c-muted)">Secondaire</label>
+            <label for="s-text" style="font-size:0.78rem;color:var(--c-muted)">Texte</label>
             <input type="color" id="s-primary" data-style="primary" title="Nom, liens et accents.">
-          </div>
-          <div class="field-row">
-            <label for="s-secondary">Couleur secondaire</label>
-            <input type="color" id="s-secondary" data-style="secondary" title="Entreprise et éléments discrets.">
-          </div>
-          <div class="field-row">
-            <label for="s-text">Couleur du texte</label>
-            <input type="color" id="s-text" data-style="text">
+            <input type="color" id="s-secondary" data-style="secondary" title="Entreprise et éléments secondaires.">
+            <input type="color" id="s-text" data-style="text" title="Couleur du texte courant.">
           </div>
           <div class="field-row">
             <label for="s-align">Alignement</label>
@@ -213,90 +205,75 @@
             </select>
           </div>
           <div class="field-row">
-            <label for="s-spacing">Espacements</label>
+            <label for="s-spacing">Espacement</label>
             <input type="range" id="s-spacing" data-style="spacing" min="2" max="16" step="1">
-            <output for="s-spacing" id="out-spacing">6 px</output>
+            <output for="s-spacing" id="out-spacing">6px</output>
           </div>
           <div class="field-row">
-            <label for="s-photoSize">Taille photo</label>
+            <label for="s-photoSize">Photo</label>
             <input type="range" id="s-photoSize" data-style="photoSize" min="48" max="120" step="4">
-            <output for="s-photoSize" id="out-photoSize">72 px</output>
+            <output for="s-photoSize" id="out-photoSize">72px</output>
           </div>
           <div class="field-row">
-            <label for="s-logoSize">Taille logo</label>
+            <label for="s-logoSize">Logo</label>
             <input type="range" id="s-logoSize" data-style="logoSize" min="50" max="180" step="5">
-            <output for="s-logoSize" id="out-logoSize">100 px</output>
+            <output for="s-logoSize" id="out-logoSize">100px</output>
           </div>
           <div class="field-row">
-            <label for="s-iconSize">Taille icônes</label>
+            <label for="s-iconSize">Icônes</label>
             <input type="range" id="s-iconSize" data-style="iconSize" min="16" max="32" step="2">
-            <output for="s-iconSize" id="out-iconSize">22 px</output>
+            <output for="s-iconSize" id="out-iconSize">22px</output>
           </div>
         </fieldset>
       </form>
     </section>
 
-    <!-- ================= ZONE 3 : aperçu + export ================= -->
     <section class="panel panel-right" aria-labelledby="titre-apercu">
       <h2 id="titre-apercu">3. Aperçu</h2>
 
       <div class="preview-toolbar" role="toolbar" aria-label="Options d'aperçu">
-        <div class="toggle-group" aria-label="Fond de l'aperçu">
-          <button type="button" id="btn-bg-light" class="btn btn-small is-active" title="Simuler un e-mail sur fond clair.">☀️ Clair</button>
-          <button type="button" id="btn-bg-dark" class="btn btn-small" title="Simuler un e-mail en mode sombre.">🌙 Sombre</button>
+        <div class="toggle-group" aria-label="Fond">
+          <button type="button" id="btn-bg-light" class="btn is-active" title="Fond clair">☀️ Clair</button>
+          <button type="button" id="btn-bg-dark" class="btn" title="Fond sombre">🌙 Sombre</button>
         </div>
-        <div class="toggle-group" aria-label="Appareil simulé">
-          <button type="button" id="btn-dev-desktop" class="btn btn-small is-active" title="Largeur d'un e-mail sur ordinateur.">🖥️ Ordinateur</button>
-          <button type="button" id="btn-dev-mobile" class="btn btn-small" title="Largeur d'un e-mail sur mobile.">📱 Mobile</button>
+        <div class="toggle-group" aria-label="Appareil">
+          <button type="button" id="btn-dev-desktop" class="btn is-active" title="Vue ordinateur">🖥️ Ordinateur</button>
+          <button type="button" id="btn-dev-mobile" class="btn" title="Vue mobile">📱 Mobile</button>
         </div>
       </div>
 
-      <!-- Simulation d'un e-mail -->
       <div id="email-frame" class="email-frame bg-light device-desktop">
         <div class="email-chrome" aria-hidden="true">
           <span class="email-meta">De : vous@entreprise.fr</span>
           <span class="email-meta">Objet : Re: notre échange</span>
         </div>
         <div class="email-body">
-          <p class="email-text" aria-hidden="true">Bonjour,<br>Merci pour votre retour, je reviens vers vous rapidement.<br><br>Cordialement,</p>
+          <p class="email-text" aria-hidden="true">Bonjour,<br>Merci pour votre retour.<br><br>Cordialement,</p>
           <div id="preview-signature" tabindex="0" aria-label="Aperçu de la signature. Cliquez sur un élément pour le modifier."></div>
         </div>
       </div>
 
-      <!-- Avertissements de validation -->
       <div id="warnings" class="warnings" role="status" aria-live="polite"></div>
 
-      <h2>Export</h2>
+      <h2>4. Export</h2>
       <div class="export-actions">
-        <button type="button" id="btn-copy" class="btn btn-primary"
-                title="Copie la signature mise en forme : collez-la directement dans les réglages de votre messagerie.">
-          📋 Copier la signature
-        </button>
-        <button type="button" id="btn-select" class="btn btn-secondary"
-                title="Solution de secours : sélectionne la signature dans l'aperçu pour copier avec Ctrl+C / Cmd+C.">
-          🖱️ Sélection manuelle
-        </button>
-        <button type="button" id="btn-copy-html" class="btn btn-secondary"
-                title="Copie le code HTML brut de la signature.">
-          &lt;/&gt; Copier le code HTML
-        </button>
-        <button type="button" id="btn-download" class="btn btn-secondary"
-                title="Télécharge un fichier signature.html autonome.">
-          💾 Télécharger le HTML
-        </button>
+        <button type="button" id="btn-copy" class="btn btn-primary" title="Copie la signature formatée dans le presse-papiers.">📋 Copier</button>
+        <button type="button" id="btn-select" class="btn btn-secondary" title="Sélectionne la signature pour copie manuelle (Ctrl+C).">🖱️ Sélection</button>
+        <button type="button" id="btn-copy-html" class="btn btn-secondary" title="Copie le code HTML brut.">&lt;/&gt; HTML</button>
+        <button type="button" id="btn-download" class="btn btn-secondary" title="Télécharge un fichier .html.">💾 Fichier</button>
       </div>
-      <p class="hint hint-important">
-        ⚠️ Pour que les images s'affichent chez vos destinataires, elles doivent être hébergées
-        publiquement (site web, CDN…) et référencées par une URL absolue en <code>https://</code>.
-        Voir le README.
-      </p>
+
+      <div class="hint-important">
+        <strong>⚠️ Images dans l'e-mail</strong><br>
+        Les images ci-dessus sont automatiquement converties en URLs absolues vers ce site lors de la copie,
+        afin qu'elles s'affichent chez vos destinataires.
+      </div>
     </section>
   </main>
 
-  <!-- Message de confirmation / erreur -->
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <div id="modal-layer" hidden></div>
 
-  <!-- Secours pour la banque d'images quand fetch() est bloqué en file:// -->
   <script src="assets/images-data.js"></script>
   <script src="app.js"></script>
 </body>
