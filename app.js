@@ -338,9 +338,10 @@ function renderTemplateList() {
 }
 
 function renderImageSlots() {
-  $("#slot-photo").src = state.data.photo || "";
-  $("#slot-logo").src = state.data.logo || "";
-  $("#slot-banner").src = state.data.banner || "";
+  const setImg = (id, val) => { const el = $(id); if (el) el.src = val || ""; };
+  setImg("#slot-photo", state.data.photo);
+  setImg("#slot-logo", state.data.logo);
+  setImg("#slot-banner", state.data.banner);
 }
 
 function renderWarnings() {
@@ -418,9 +419,9 @@ function showToast(message, type = "success") {
   const t = $("#toast");
   t.textContent = message;
   t.className = "toast is-" + type;
-  t.removeAttribute("hidden");
+  t.classList.remove("is-hidden");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.setAttribute("hidden", ""); }, 3500);
+  toastTimer = setTimeout(() => { t.classList.add("is-hidden"); }, 3500);
 }
 
 const TPL_COLORS = {
@@ -453,8 +454,8 @@ function showModal(title, message, onConfirm) {
       </div>
     </div>
   </div>`;
-  layer.hidden = false;
-  const close = () => { layer.innerHTML = ""; layer.hidden = true; };
+  layer.classList.remove("is-hidden");
+  const close = () => { layer.innerHTML = ""; layer.classList.add("is-hidden"); };
   $("#modal-cancel").addEventListener("click", close);
   $("#modal-confirm").addEventListener("click", () => { close(); onConfirm(); });
   layer.querySelector(".modal-overlay").addEventListener("click", (e) => {
@@ -533,14 +534,13 @@ function openBankPreview(img, btn) {
   $("#bank-preview-img").src = img.file;
   $("#bank-preview-img").alt = img.alt || "Aperçu";
   $("#bank-preview-name").textContent = img.alt || img.name || "";
-  $("#bank-preview").hidden = false;
+  $("#bank-preview").classList.remove("is-hidden");
 }
 
 function closeBankPreview() {
-  $("#bank-preview").hidden = true;
+  $("#bank-preview").classList.add("is-hidden");
   selectedBankImage = null;
-  $$(".bank-item").forEach((el) => el.classList.remove("is-selected"));
-}
+  $$(".bank-item").forEach((el) => el.classList.remove("is-selected"));}
 
 function handleImportFile(file) {
   if (!file) return;

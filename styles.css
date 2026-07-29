@@ -154,7 +154,7 @@ body {
   grid-template-columns: repeat(3, 1fr);
   gap: 0.45rem;
 }
-@media (max-width: 720px) { .bank-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 720px) { .bank-grid { grid-template-columns: repeat(3, 1fr); } }
 
 .bank-item {
   border: 2px solid var(--c-border);
@@ -182,6 +182,7 @@ body {
   background: #fafbfe;
   animation: fadeIn 0.2s ease;
 }
+.bank-preview.is-hidden { display: none; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 .bank-preview h3 { margin: 0 0 0.4rem; font-size: 0.82rem; }
 .bank-preview img { max-width: 100%; max-height: 90px; display: block; margin: 0 auto 0.3rem; border-radius: 4px; }
@@ -246,8 +247,14 @@ legend input[type="checkbox"] { vertical-align: middle; }
   .field-row input[type="checkbox"] { justify-self: end; }
   .field-row textarea { grid-column: 1; }
   .field-row input[type="color"] { width: 100%; height: 38px; }
+  .image-slot { grid-template-columns: 1fr; }
+  .color-row { grid-template-columns: 1fr 1fr; }
+  .color-row input[type="color"] { height: 36px; }
 }
 
+.color-row { grid-template-columns: 1fr 1fr 1fr; }
+.color-row label { font-size: 0.78rem; color: var(--c-muted); text-align: center; }
+.color-row input[type="color"] { width: 100%; height: 32px; }
 .image-slot { grid-template-columns: 60px 1fr auto; }
 .image-slot .slot-thumb { height: 38px; max-width: 80px; object-fit: contain; border: 1px solid var(--c-border); border-radius: 4px; background: #fff; padding: 1px; justify-self: start; }
 .slot-thumb-wide { max-width: 100%; max-height: 44px; }
@@ -334,8 +341,11 @@ legend input[type="checkbox"] { vertical-align: middle; }
 }
 .toast.is-error { background: var(--c-danger); }
 .toast.is-success { background: var(--c-ok); }
-.toast[hidden] { display: block; opacity: 0; transform: translateX(-50%) translateY(10px); pointer-events: none; }
+.toast.is-hidden { opacity: 0; transform: translateX(-50%) translateY(10px); pointer-events: none; }
+.toast:not(.is-hidden) { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+#modal-layer.is-hidden,
+#modal-layer.is-hidden .modal-overlay { display: none; }
 .modal-overlay {
   position: fixed; inset: 0; z-index: 999;
   background: rgba(0,0,0,0.35);

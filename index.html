@@ -43,7 +43,7 @@
         <input type="file" id="import-file" accept="image/png,image/jpeg,image/svg+xml,image/gif,image/webp" hidden>
       </div>
 
-      <div id="bank-preview" class="bank-preview" hidden>
+      <div id="bank-preview" class="bank-preview is-hidden">
         <h3>Aperçu</h3>
         <img id="bank-preview-img" src="" alt="Aperçu de l'image sélectionnée">
         <p id="bank-preview-name" class="hint"></p>
@@ -188,10 +188,10 @@
             <input type="range" id="s-nameSize" data-style="nameSize" min="13" max="26" step="1">
             <output for="s-nameSize" id="out-nameSize">17px</output>
           </div>
-          <div class="field-row" style="grid-template-columns:1fr 1fr 1fr">
-            <label for="s-primary" style="font-size:0.78rem;color:var(--c-muted)">Principale</label>
-            <label for="s-secondary" style="font-size:0.78rem;color:var(--c-muted)">Secondaire</label>
-            <label for="s-text" style="font-size:0.78rem;color:var(--c-muted)">Texte</label>
+          <div class="field-row color-row">
+            <label for="s-primary">Principale</label>
+            <label for="s-secondary">Secondaire</label>
+            <label for="s-text">Texte</label>
             <input type="color" id="s-primary" data-style="primary" title="Nom, liens et accents.">
             <input type="color" id="s-secondary" data-style="secondary" title="Entreprise et éléments secondaires.">
             <input type="color" id="s-text" data-style="text" title="Couleur du texte courant.">
@@ -271,8 +271,8 @@
     </section>
   </main>
 
-  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-  <div id="modal-layer" hidden></div>
+  <div id="toast" class="toast is-hidden" role="status" aria-live="polite"></div>
+  <div id="modal-layer" class="is-hidden"></div>
 
   <script src="assets/images-data.js"></script>
   <script src="app.js"></script>
