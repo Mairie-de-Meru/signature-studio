@@ -561,7 +561,6 @@ function showModal(title, message, onConfirm) {
 
 let imageBank = { categories: [] };
 let currentCategory = "entreprise";
-let selectedBankImage = null;
 
 async function loadImageBank() {
   try {
@@ -618,25 +617,35 @@ function renderBankGrid() {
     b.className = "bank-item";
     b.title = img.alt || "";
     b.innerHTML = `<img src="${esc(img.file)}" alt="${esc(img.alt || "")}" loading="lazy">`;
-    b.addEventListener("click", () => openBankPreview(img, b));
+    b.addEventListener("click", () => applyBankImageDirect(currentCategory, img, b));
     grid.appendChild(b);
   }
 }
 
-function openBankPreview(img, btn) {
-  selectedBankImage = img;
-  $$(".bank-item").forEach((el) => el.classList.remove("is-selected"));
-  if (btn) btn.classList.add("is-selected");
-  $("#bank-preview-img").src = img.file;
-  $("#bank-preview-img").alt = img.alt || "Aperçu";
-  $("#bank-preview-name").textContent = img.alt || img.name || "";
-  $("#bank-preview").classList.remove("is-hidden");
+function slotForImage(catId, img) {
+  const f = (img.file || "").toLowerCase();
+  if (f.includes("banniere") || f.includes("bannière")) return "banner";
+  if (catId === "avatars" || f.includes("avatar")) return "photo";
+  if (catId === "logos" || f.includes("logo")) return "logo";
+  if (catId === "entreprise") return "logo";
+  if (catId === "social") return null;
+  return "logo";
 }
 
-function closeBankPreview() {
-  $("#bank-preview").classList.add("is-hidden");
-  selectedBankImage = null;
+function applyBankImageDirect(catId, img, btn) {
+  const slot = slotForImage(catId, img);
+  if (!slot) {
+    showToast("Ces icônes ne sont pas placées comme image dans la signature.", "info");
+    return;
+  }
   $$(".bank-item").forEach((el) => el.classList.remove("is-selected"));
+  if (btn) btn.classList.add("is-selected");
+  updateState((s) => {
+    s.data[slot] = img.file;
+    s.show[slot] = true;
+  });
+  const labels = { photo: "photo", logo: "logo", banner: "bannière" };
+  showToast(`Image appliquée comme ${labels[slot]}.`, "success");
 }
 
 function openZoom(src, alt) {
@@ -666,8 +675,8 @@ function handleImportFile(file) {
     currentCategory = "imports";
     renderBankTabs();
     renderBankGrid();
-    openBankPreview(entry);
-    showToast("Image importée. Choisissez son usage.", "success");
+    applyBankImageDirect("imports", entry);
+    showToast("Image importée et appliquée comme logo.", "success");
   };
   reader.onerror = () => showToast("Impossible de lire ce fichier.", "error");
   reader.readAsDataURL(file);
@@ -784,26 +793,10 @@ function bindEvents() {
     handleImportFile(e.target.files[0]);
     e.target.value = "";
   });
-  $("#bank-preview-close").addEventListener("click", closeBankPreview);
 
   $("#zoom-close").addEventListener("click", closeZoom);
   $("#zoom-layer").addEventListener("click", (e) => { if (e.target.id === "zoom-layer") closeZoom(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeZoom(); });
-
-  $$("[data-use-as]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      if (!selectedBankImage) return;
-      const slot = btn.dataset.useAs;
-      updateState((s) => {
-        s.data[slot] = selectedBankImage.file;
-        s.show[slot] = true;
-      });
-      syncFormFromState();
-      closeBankPreview();
-      const labels = { photo: "photo", logo: "logo", banner: "bannière" };
-      showToast(`Image appliquée comme ${labels[slot]}.`, "success");
-    });
-  });
 
   $("#btn-copy").addEventListener("click", copySignature);
   $("#btn-select").addEventListener("click", () => {

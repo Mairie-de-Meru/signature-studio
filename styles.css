@@ -291,23 +291,6 @@ button { font-family: inherit; }
 .bank-import { margin-top: var(--sp-3); }
 .bank-import .btn { display: inline-block; }
 
-.bank-preview {
-  margin-top: var(--sp-3);
-  border: 1px solid var(--c-border);
-  border-radius: var(--r-md);
-  padding: var(--sp-3);
-  background: var(--c-surface-2);
-}
-.bank-preview.is-hidden { display: none; }
-.bank-preview img {
-  max-width: 100%;
-  max-height: 220px;
-  display: block;
-  margin: 0 auto var(--sp-2);
-  border-radius: var(--r-sm);
-}
-.bank-preview-actions { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
-
 /* ===================== Forms ===================== */
 fieldset {
   border: 1px solid var(--c-border);
