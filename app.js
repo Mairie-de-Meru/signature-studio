@@ -623,6 +623,7 @@ function renderBankGrid() {
 }
 
 function slotForImage(catId, img) {
+  if (img.slot) return img.slot;
   const f = (img.file || "").toLowerCase();
   if (f.includes("banniere") || f.includes("bannière")) return "banner";
   if (catId === "avatars" || f.includes("avatar")) return "photo";

@@ -5,8 +5,14 @@
       "label": "Entreprise",
       "description": "Vos visuels officiels. Remplacez les fichiers du dossier assets/images/entreprise.",
       "images": [
-        { "file": "assets/images/entreprise/logo-entreprise.svg", "alt": "Logo de l'entreprise (emplacement à remplacer)" },
-        { "file": "assets/images/entreprise/banniere-entreprise.svg", "alt": "Bannière de l'entreprise (emplacement à remplacer)" }
+        {
+          "file": "assets/images/entreprise/logo-entreprise.svg",
+          "alt": "Logo de l'entreprise (emplacement à remplacer)"
+        },
+        {
+          "file": "assets/images/entreprise/banniere-entreprise.svg",
+          "alt": "Bannière de l'entreprise (emplacement à remplacer)"
+        }
       ]
     },
     {
@@ -14,10 +20,22 @@
       "label": "Avatars",
       "description": "Avatars génériques en attendant une vraie photo.",
       "images": [
-        { "file": "assets/images/avatars/avatar-1.svg", "alt": "Avatar générique bleu" },
-        { "file": "assets/images/avatars/avatar-2.svg", "alt": "Avatar générique orange" },
-        { "file": "assets/images/avatars/avatar-3.svg", "alt": "Avatar générique vert" },
-        { "file": "assets/images/avatars/avatar-4.svg", "alt": "Avatar générique violet" }
+        {
+          "file": "assets/images/avatars/avatar-1.svg",
+          "alt": "Avatar générique bleu"
+        },
+        {
+          "file": "assets/images/avatars/avatar-2.svg",
+          "alt": "Avatar générique orange"
+        },
+        {
+          "file": "assets/images/avatars/avatar-3.svg",
+          "alt": "Avatar générique vert"
+        },
+        {
+          "file": "assets/images/avatars/avatar-4.svg",
+          "alt": "Avatar générique violet"
+        }
       ]
     },
     {
@@ -25,9 +43,18 @@
       "label": "Logos",
       "description": "Logos temporaires de démonstration.",
       "images": [
-        { "file": "assets/images/logos/logo-1.svg", "alt": "Logo de démonstration ACME" },
-        { "file": "assets/images/logos/logo-2.svg", "alt": "Logo de démonstration Studio" },
-        { "file": "assets/images/logos/logo-3.svg", "alt": "Logo de démonstration Peak" }
+        {
+          "file": "assets/images/logos/logo-1.svg",
+          "alt": "Logo de démonstration ACME"
+        },
+        {
+          "file": "assets/images/logos/logo-2.svg",
+          "alt": "Logo de démonstration Studio"
+        },
+        {
+          "file": "assets/images/logos/logo-3.svg",
+          "alt": "Logo de démonstration Peak"
+        }
       ]
     },
     {
@@ -35,8 +62,14 @@
       "label": "Bannières",
       "description": "Bannières promotionnelles génériques.",
       "images": [
-        { "file": "assets/images/bannieres/banniere-1.svg", "alt": "Bannière dégradé bleu-vert" },
-        { "file": "assets/images/bannieres/banniere-2.svg", "alt": "Bannière sombre Nouveautés" }
+        {
+          "file": "assets/images/bannieres/banniere-1.svg",
+          "alt": "Bannière dégradé bleu-vert"
+        },
+        {
+          "file": "assets/images/bannieres/banniere-2.svg",
+          "alt": "Bannière sombre Nouveautés"
+        }
       ]
     },
     {
@@ -44,11 +77,236 @@
       "label": "Icônes sociales",
       "description": "Icônes de référence (la signature utilise des pastilles compatibles e-mail).",
       "images": [
-        { "file": "assets/images/social/linkedin.svg", "alt": "Icône LinkedIn" },
-        { "file": "assets/images/social/instagram.svg", "alt": "Icône Instagram" },
-        { "file": "assets/images/social/facebook.svg", "alt": "Icône Facebook" },
-        { "file": "assets/images/social/x.svg", "alt": "Icône X" },
-        { "file": "assets/images/social/youtube.svg", "alt": "Icône YouTube" }
+        {
+          "file": "assets/images/social/linkedin.svg",
+          "alt": "Icône LinkedIn"
+        },
+        {
+          "file": "assets/images/social/instagram.svg",
+          "alt": "Icône Instagram"
+        },
+        {
+          "file": "assets/images/social/facebook.svg",
+          "alt": "Icône Facebook"
+        },
+        {
+          "file": "assets/images/social/x.svg",
+          "alt": "Icône X"
+        },
+        {
+          "file": "assets/images/social/youtube.svg",
+          "alt": "Icône YouTube"
+        }
+      ]
+    },
+    {
+      "id": "mairies",
+      "label": "Hôtels de ville",
+      "description": "Images libres de droits (Wikimedia Commons, bannière).",
+      "images": [
+        {
+          "file": "assets/images/banks/mairies/The-Hotel-de-Ville-after-the-Commune-jpg-0.jpg",
+          "alt": "<div class=\"fn\">\nThe Hôtel de Ville after the Commune</div>",
+          "slot": "banner",
+          "license": "Public domain",
+          "source": "https://commons.wikimedia.org/wiki/File:The_H%C3%B6tel_de_Ville_after_the_Commune.jpg"
+        },
+        {
+          "file": "assets/images/banks/mairies/Paris-Hotel-de-ville-C-Marville-1871-jpg-1.jpg",
+          "alt": "Paris Hôtel de ville C. Marville 1871",
+          "slot": "banner",
+          "license": "Public domain",
+          "source": "https://commons.wikimedia.org/wiki/File:Paris_H%C3%B4tel_de_ville_C._Marville_1871.jpg"
+        },
+        {
+          "file": "assets/images/banks/mairies/Hotel-Ville-Paris-burnt-Commune-1871-jpg-2.jpg",
+          "alt": "Hôtel Ville Paris burnt Commune 1871",
+          "slot": "banner",
+          "license": "Public domain",
+          "source": "https://commons.wikimedia.org/wiki/File:H%C3%B4tel_Ville_Paris_burnt_Commune_1871.jpg"
+        },
+        {
+          "file": "assets/images/banks/mairies/Paris-Hotel-de-Ville-2014-1714-jpg-3.jpg",
+          "alt": "Paris, Hôtel de Ville -- 2014 -- 1714",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Paris,_H%C3%B4tel_de_Ville_--_2014_--_1714.jpg"
+        },
+        {
+          "file": "assets/images/banks/mairies/Hotel-de-ville-Oberhergheim-jpg-4.jpg",
+          "alt": "Hôtel de ville (Oberhergheim)",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:H%C3%B4tel_de_ville_(Oberhergheim).jpg"
+        },
+        {
+          "file": "assets/images/banks/mairies/Paris-Hotel-de-Ville-Putti-1-jpg-5.jpg",
+          "alt": "Paris Hôtel de Ville Putti (1)",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Paris_H%C3%B4tel_de_Ville_Putti_(1).jpg"
+        }
+      ]
+    },
+    {
+      "id": "vie-locale",
+      "label": "Vie locale",
+      "description": "Images libres de droits (Wikimedia Commons, bannière).",
+      "images": [
+        {
+          "file": "assets/images/banks/vie-locale/Nonac-Place-publique-2013-JPG-0.jpg",
+          "alt": "Nonac Place publique 2013",
+          "slot": "banner",
+          "license": "CC BY-SA 3.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Nonac_Place_publique_2013.JPG"
+        },
+        {
+          "file": "assets/images/banks/vie-locale/Place-publique-Marche-pour-le-climat-Nevers-16-Mar-1.jpg",
+          "alt": "Place publique, Marche pour le climat, Nevers, 16 Mar 2019",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Place_publique,_Marche_pour_le_climat,_Nevers,_16_Mar_2019.jpg"
+        },
+        {
+          "file": "assets/images/banks/vie-locale/Logo-Place-publique-svg-2.png",
+          "alt": "Logo Place publique",
+          "slot": "banner",
+          "license": "Public domain",
+          "source": "https://commons.wikimedia.org/wiki/File:Logo_Place_publique.svg"
+        },
+        {
+          "file": "assets/images/banks/vie-locale/Jardin-Place-01-jpg-3.jpg",
+          "alt": "Jardin Place 01",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Jardin_Place_01.jpg"
+        },
+        {
+          "file": "assets/images/banks/vie-locale/Place-Agnico-Eagle-jpg-4.jpg",
+          "alt": "Place Agnico-Eagle",
+          "slot": "banner",
+          "license": "CC0",
+          "source": "https://commons.wikimedia.org/wiki/File:Place_Agnico-Eagle.jpg"
+        },
+        {
+          "file": "assets/images/banks/vie-locale/Place-Agnico-Eagle-arriere-jpg-5.jpg",
+          "alt": "Place Agnico-Eagle arrière",
+          "slot": "banner",
+          "license": "CC0",
+          "source": "https://commons.wikimedia.org/wiki/File:Place_Agnico-Eagle_arri%C3%A8re.jpg"
+        }
+      ]
+    },
+    {
+      "id": "nature",
+      "label": "Nature & Parcs",
+      "description": "Images libres de droits (Wikimedia Commons, bannière).",
+      "images": [
+        {
+          "file": "assets/images/banks/nature/Hain-Eiche-Herbst-121696-jpg-0.jpg",
+          "alt": "Hain Eiche Herbst 121696",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Hain_Eiche_Herbst_121696.jpg"
+        },
+        {
+          "file": "assets/images/banks/nature/Flowering-of-Cercis-siliquastrum-in-the-Parco-dell-1.jpg",
+          "alt": "Flowering of Cercis siliquastrum in the 'Parco delle Valli' urban park",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Flowering_of_Cercis_siliquastrum_in_the_%27Parco_delle_Valli%27_urban_park.jpg"
+        },
+        {
+          "file": "assets/images/banks/nature/Park-Srodula-Sosnowiec-Jesien-2021-jpg-2.jpg",
+          "alt": "Park Środula, Sosnowiec, Jesień 2021",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Park_%C5%9Arodula,_Sosnowiec,_Jesie%C5%84_2021.jpg"
+        },
+        {
+          "file": "assets/images/banks/nature/Croix-parc-mallet-stevens-tunnel-jpg-3.jpg",
+          "alt": "Croix parc mallet stevens tunnel",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Croix_parc_mallet_stevens_tunnel.jpg"
+        },
+        {
+          "file": "assets/images/banks/nature/Pond-at-Pearl-s-Hill-City-Park-Singapore-jpg-4.jpg",
+          "alt": "Pond at Pearl's Hill City Park, Singapore",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Pond_at_Pearl%27s_Hill_City_Park,_Singapore.jpg"
+        },
+        {
+          "file": "assets/images/banks/nature/An-Urban-Park-jpg-5.jpg",
+          "alt": "An Urban Park",
+          "slot": "banner",
+          "license": "CC BY 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:An_Urban_Park.jpg"
+        }
+      ]
+    },
+    {
+      "id": "france",
+      "label": "France & Symboles",
+      "description": "Images libres de droits (Wikimedia Commons, logo).",
+      "images": [
+        {
+          "file": "assets/images/banks/france/Hugues-Lettre-de-Marianne-aux-republicains-1871-dj-0.jpg",
+          "alt": "Hugues - Lettre de Marianne aux républicains, 1871",
+          "slot": "logo",
+          "license": "Public domain",
+          "source": "https://commons.wikimedia.org/wiki/File:Hugues_-_Lettre_de_Marianne_aux_r%C3%A9publicains,_1871.djvu"
+        },
+        {
+          "file": "assets/images/banks/france/Pour-le-drapeau-Pour-la-victoire-Souscrivez-a-l-em-1.jpg",
+          "alt": "Pour le drapeau! Pour la victoire! Souscrivez à l'emprunt national . . . Banque ",
+          "slot": "logo",
+          "license": "Public domain",
+          "source": "https://commons.wikimedia.org/wiki/File:Pour_le_drapeau!_Pour_la_victoire!_Souscrivez_%C3%A0_l%27emprunt_national_._._._Banque_nationale_de_cr%C3%A9dit_LCCN99613516.jpg"
+        },
+        {
+          "file": "assets/images/banks/france/Pour-le-Drapeau-Pour-la-Victoire-Souscrivez-a-l-Em-2.jpg",
+          "alt": "<div class=\"fn\">\nPour le Drapeau! Pour la Victoire! ... Souscrivez a l'Emprunt N",
+          "slot": "logo",
+          "license": "No restrictions",
+          "source": "https://commons.wikimedia.org/wiki/File:Pour_le_Drapeau!_Pour_la_Victoire!_..._Souscrivez_a_l%27Emprunt_National._-_DPLA_-_accf3167f4455e77771ff454fd0de569.jpg"
+        }
+      ]
+    },
+    {
+      "id": "fonds",
+      "label": "Fonds abstraits",
+      "description": "Images libres de droits (Wikimedia Commons, bannière).",
+      "images": [
+        {
+          "file": "assets/images/banks/fonds/Abstract-Blue-Background-png-0.png",
+          "alt": "Abstract Blue Background",
+          "slot": "banner",
+          "license": "CC BY-SA 3.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Abstract_Blue_Background.png"
+        },
+        {
+          "file": "assets/images/banks/fonds/Wavy-Gradient-1-Orange-and-Violet-21180369850-jpg-1.jpg",
+          "alt": "Wavy Gradient 1 Orange and Violet (21180369850)",
+          "slot": "banner",
+          "license": "CC BY 2.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Wavy_Gradient_1_Orange_and_Violet_(21180369850).jpg"
+        },
+        {
+          "file": "assets/images/banks/fonds/Geometric-Abstract-Background-jpg-2.jpg",
+          "alt": "Geometric Abstract Background",
+          "slot": "banner",
+          "license": "CC0",
+          "source": "https://commons.wikimedia.org/wiki/File:Geometric_Abstract_Background.jpg"
+        },
+        {
+          "file": "assets/images/banks/fonds/Gradient-Abstract-Background-jpg-3.jpg",
+          "alt": "Gradient Abstract Background",
+          "slot": "banner",
+          "license": "CC0",
+          "source": "https://commons.wikimedia.org/wiki/File:Gradient_Abstract_Background.jpg"
+        }
       ]
     }
   ]
