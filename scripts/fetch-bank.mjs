@@ -11,6 +11,9 @@ const CATS = [
   { id: "nature",     label: "Nature & Parcs",  query: "parc urbain jardin public",     slot: "banner", n: 6 },
   { id: "france",     label: "France & Symboles", query: "Marianne drapeau France",      slot: "logo",   n: 4 },
   { id: "fonds",      label: "Fonds abstraits", query: "abstract gradient background",   slot: "banner", n: 6 },
+  { id: "bureaux",    label: "Bureaux & Travail", query: "modern office workspace",      slot: "banner", n: 6 },
+  { id: "technologie", label: "Technologie",       query: "technology circuit network",  slot: "banner", n: 6 },
+  { id: "transports", label: "Transports",         query: "train station public transport", slot: "banner", n: 6 },
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

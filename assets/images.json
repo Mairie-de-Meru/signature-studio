@@ -308,6 +308,132 @@
           "source": "https://commons.wikimedia.org/wiki/File:Gradient_Abstract_Background.jpg"
         }
       ]
+    },
+    {
+      "id": "bureaux",
+      "label": "Bureaux & Travail",
+      "description": "Images libres de droits (Wikimedia Commons, bannière).",
+      "images": [
+        {
+          "file": "assets/images/banks/bureaux/EFTA00000865-Modern-office-workspace-featuring-mul-0.jpg",
+          "alt": "EFTA00000865 - Modern office workspace featuring multiple monitors on a wall a l",
+          "slot": "banner",
+          "license": "Public domain",
+          "source": "https://commons.wikimedia.org/wiki/File:EFTA00000865_-_Modern_office_workspace_featuring_multiple_monitors_on_a_wall_a_laptop_on_a_desk_and_a_cluttered_yet_functional_setup.jpg"
+        },
+        {
+          "file": "assets/images/banks/bureaux/Modern-office-workspace-featuring-a-computer-jpg-1.jpg",
+          "alt": "Modern office workspace featuring a computer",
+          "slot": "banner",
+          "license": "CC BY 2.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Modern_office_workspace_featuring_a_computer.jpg"
+        },
+        {
+          "file": "assets/images/banks/bureaux/Modern-office-workspace-with-a-stylish-desk-jpg-2.jpg",
+          "alt": "Modern office workspace with a stylish desk",
+          "slot": "banner",
+          "license": "CC BY 2.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Modern_office_workspace_with_a_stylish_desk.jpg"
+        },
+        {
+          "file": "assets/images/banks/bureaux/Business-professional-engages-in-note-taking-durin-3.jpg",
+          "alt": "Business professional engages in note-taking during a meeting at a modern office",
+          "slot": "banner",
+          "license": "CC BY 2.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Business_professional_engages_in_note-taking_during_a_meeting_at_a_modern_office_desk.jpg"
+        },
+        {
+          "file": "assets/images/banks/bureaux/Person-writing-in-notebook-while-using-laptop-at-a-4.jpg",
+          "alt": "Person writing in notebook while using laptop at a modern workspace",
+          "slot": "banner",
+          "license": "CC BY 2.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Person_writing_in_notebook_while_using_laptop_at_a_modern_workspace.jpg"
+        },
+        {
+          "file": "assets/images/banks/bureaux/Mini-shopping-cart-placed-on-a-table-next-to-a-lap-5.jpg",
+          "alt": "Mini shopping cart placed on a table next to a laptop in a modern office setting",
+          "slot": "banner",
+          "license": "CC BY 2.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Mini_shopping_cart_placed_on_a_table_next_to_a_laptop_in_a_modern_office_setting.jpg"
+        }
+      ]
+    },
+    {
+      "id": "technologie",
+      "label": "Technologie",
+      "description": "Images libres de droits (Wikimedia Commons, bannière).",
+      "images": [
+        {
+          "file": "assets/images/banks/technologie/Forest-of-synthetic-pyramidal-dendrites-grown-usin-0.png",
+          "alt": "Forest of synthetic pyramidal dendrites grown using Cajal's laws of neuronal bra",
+          "slot": "banner",
+          "license": "CC BY 2.5",
+          "source": "https://commons.wikimedia.org/wiki/File:Forest_of_synthetic_pyramidal_dendrites_grown_using_Cajal%27s_laws_of_neuronal_branching.png"
+        },
+        {
+          "file": "assets/images/banks/technologie/Wireless-network-interface-controller-Gigabyte-GC--1.jpg",
+          "alt": "Wireless network interface controller Gigabyte GC-WB867D-I - front and back - 20",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Wireless_network_interface_controller_Gigabyte_GC-WB867D-I_-_front_and_back_-_2018-05-15.jpg"
+        },
+        {
+          "file": "assets/images/banks/technologie/Liquid-circuit-cooling-installation-for-a-Static-V-2.jpg",
+          "alt": "Liquid circuit cooling installation for a Static VAR Compensator used in a large",
+          "slot": "banner",
+          "license": "CC BY 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Liquid_circuit_cooling_installation_for_a_Static_VAR_Compensator_used_in_a_large_high_voltage_electrical_distribution_network.jpg"
+        }
+      ]
+    },
+    {
+      "id": "transports",
+      "label": "Transports",
+      "description": "Images libres de droits (Wikimedia Commons, bannière).",
+      "images": [
+        {
+          "file": "assets/images/banks/transports/Locomotive-EPL2T-on-train-station-in-Donetsk-jpg-0.jpg",
+          "alt": "Locomotive EPL2T on train station in Donetsk",
+          "slot": "banner",
+          "license": "CC BY-SA 3.0",
+          "source": "https://commons.wikimedia.org/wiki/File:Locomotive_EPL2T_on_train_station_in_Donetsk.jpg"
+        },
+        {
+          "file": "assets/images/banks/transports/140th-anniversary-of-public-transport-in-Szczecin--1.jpg",
+          "alt": "140th anniversary of public transport in Szczecin, Police train station (3)",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:140th_anniversary_of_public_transport_in_Szczecin,_Police_train_station_(3).jpg"
+        },
+        {
+          "file": "assets/images/banks/transports/140th-anniversary-of-public-transport-in-Szczecin--2.jpg",
+          "alt": "140th anniversary of public transport in Szczecin, Police train station (2)",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:140th_anniversary_of_public_transport_in_Szczecin,_Police_train_station_(2).jpg"
+        },
+        {
+          "file": "assets/images/banks/transports/140th-anniversary-of-public-transport-in-Szczecin--3.jpg",
+          "alt": "140th anniversary of public transport in Szczecin, Police train station",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:140th_anniversary_of_public_transport_in_Szczecin,_Police_train_station.jpg"
+        },
+        {
+          "file": "assets/images/banks/transports/140th-anniversary-of-public-transport-in-Szczecin--4.jpg",
+          "alt": "140th anniversary of public transport in Szczecin, Police train station (4)",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:140th_anniversary_of_public_transport_in_Szczecin,_Police_train_station_(4).jpg"
+        },
+        {
+          "file": "assets/images/banks/transports/CRT-jpg-5.jpg",
+          "alt": "CRT鲤鱼池 站台间换乘通道",
+          "slot": "banner",
+          "license": "CC BY-SA 4.0",
+          "source": "https://commons.wikimedia.org/wiki/File:CRT%E9%B2%A4%E9%B1%BC%E6%B1%A0_%E7%AB%99%E5%8F%B0%E9%97%B4%E6%8D%A2%E4%B9%98%E9%80%9A%E9%81%93.jpg"
+        }
+      ]
     }
   ]
 }
