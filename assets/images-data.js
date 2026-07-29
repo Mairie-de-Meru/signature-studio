@@ -1,0 +1,64 @@
+/*
+ * Banque d'images — solution de secours.
+ * Ce fichier est utilisé quand le navigateur bloque la lecture de
+ * assets/images.json en ouverture directe de index.html (protocole file://).
+ * IMPORTANT : gardez ce fichier synchronisé avec assets/images.json.
+ * Pour ajouter une image : copiez le fichier dans assets/images/<categorie>/
+ * puis ajoutez une entrée { file, alt } dans la catégorie correspondante,
+ * ici ET dans images.json.
+ */
+window.IMAGE_BANK = {
+  categories: [
+    {
+      id: "entreprise",
+      label: "Entreprise",
+      description: "Vos visuels officiels. Remplacez les fichiers du dossier assets/images/entreprise.",
+      images: [
+        { file: "assets/images/entreprise/logo-entreprise.svg", alt: "Logo de l'entreprise (emplacement à remplacer)" },
+        { file: "assets/images/entreprise/banniere-entreprise.svg", alt: "Bannière de l'entreprise (emplacement à remplacer)" }
+      ]
+    },
+    {
+      id: "avatars",
+      label: "Avatars",
+      description: "Avatars génériques en attendant une vraie photo.",
+      images: [
+        { file: "assets/images/avatars/avatar-1.svg", alt: "Avatar générique bleu" },
+        { file: "assets/images/avatars/avatar-2.svg", alt: "Avatar générique orange" },
+        { file: "assets/images/avatars/avatar-3.svg", alt: "Avatar générique vert" },
+        { file: "assets/images/avatars/avatar-4.svg", alt: "Avatar générique violet" }
+      ]
+    },
+    {
+      id: "logos",
+      label: "Logos",
+      description: "Logos temporaires de démonstration.",
+      images: [
+        { file: "assets/images/logos/logo-1.svg", alt: "Logo de démonstration ACME" },
+        { file: "assets/images/logos/logo-2.svg", alt: "Logo de démonstration Studio" },
+        { file: "assets/images/logos/logo-3.svg", alt: "Logo de démonstration Peak" }
+      ]
+    },
+    {
+      id: "bannieres",
+      label: "Bannières",
+      description: "Bannières promotionnelles génériques.",
+      images: [
+        { file: "assets/images/bannieres/banniere-1.svg", alt: "Bannière dégradé bleu-vert" },
+        { file: "assets/images/bannieres/banniere-2.svg", alt: "Bannière sombre Nouveautés" }
+      ]
+    },
+    {
+      id: "social",
+      label: "Icônes sociales",
+      description: "Icônes de référence (la signature utilise des pastilles compatibles e-mail).",
+      images: [
+        { file: "assets/images/social/linkedin.svg", alt: "Icône LinkedIn" },
+        { file: "assets/images/social/instagram.svg", alt: "Icône Instagram" },
+        { file: "assets/images/social/facebook.svg", alt: "Icône Facebook" },
+        { file: "assets/images/social/x.svg", alt: "Icône X" },
+        { file: "assets/images/social/youtube.svg", alt: "Icône YouTube" }
+      ]
+    }
+  ]
+};
