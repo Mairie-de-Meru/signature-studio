@@ -434,6 +434,103 @@
           "source": "https://commons.wikimedia.org/wiki/File:CRT%E9%B2%A4%E9%B1%BC%E6%B1%A0_%E7%AB%99%E5%8F%B0%E9%97%B4%E6%8D%A2%E4%B9%98%E9%80%9A%E9%81%93.jpg"
         }
       ]
+    },
+    {
+      "id": "monochromes",
+      "label": "Avatars monochromes",
+      "description": "Images libres de droits (Wikimedia Commons, logo).",
+      "images": []
+    },
+    {
+      "id": "avatars-modern",
+      "label": "Avatars illustrés",
+      "description": "Avatars illustrés (DiceBear, libre de droits). Teintez-les avec le sélecteur de couleur.",
+      "images": [
+        {
+          "file": "assets/images/banks/avatars-modern/Aurelie.svg",
+          "alt": "Avatar Aurélie",
+          "slot": "photo",
+          "tintable": true,
+          "source": "DiceBear (libre de droits)"
+        },
+        {
+          "file": "assets/images/banks/avatars-modern/Camille.svg",
+          "alt": "Avatar Camille",
+          "slot": "photo",
+          "tintable": true,
+          "source": "DiceBear (libre de droits)"
+        },
+        {
+          "file": "assets/images/banks/avatars-modern/Julien.svg",
+          "alt": "Avatar Julien",
+          "slot": "photo",
+          "tintable": true,
+          "source": "DiceBear (libre de droits)"
+        },
+        {
+          "file": "assets/images/banks/avatars-modern/Marie.svg",
+          "alt": "Avatar Marie",
+          "slot": "photo",
+          "tintable": true,
+          "source": "DiceBear (libre de droits)"
+        },
+        {
+          "file": "assets/images/banks/avatars-modern/Pierre.svg",
+          "alt": "Avatar Pierre",
+          "slot": "photo",
+          "tintable": true,
+          "source": "DiceBear (libre de droits)"
+        },
+        {
+          "file": "assets/images/banks/avatars-modern/Sophie.svg",
+          "alt": "Avatar Sophie",
+          "slot": "photo",
+          "tintable": true,
+          "source": "DiceBear (libre de droits)"
+        },
+        {
+          "file": "assets/images/banks/avatars-modern/Thomas.svg",
+          "alt": "Avatar Thomas",
+          "slot": "photo",
+          "tintable": true,
+          "source": "DiceBear (libre de droits)"
+        },
+        {
+          "file": "assets/images/banks/avatars-modern/Valerie.svg",
+          "alt": "Avatar Valérie",
+          "slot": "photo",
+          "tintable": true,
+          "source": "DiceBear (libre de droits)"
+        },
+        {
+          "file": "assets/images/banks/avatars-modern/Nicolas.svg",
+          "alt": "Avatar Nicolas",
+          "slot": "photo",
+          "tintable": true,
+          "source": "DiceBear (libre de droits)"
+        },
+        {
+          "file": "assets/images/banks/avatars-modern/Isabelle.svg",
+          "alt": "Avatar Isabelle",
+          "slot": "photo",
+          "tintable": true,
+          "source": "DiceBear (libre de droits)"
+        },
+        {
+          "file": "assets/images/banks/avatars-modern/Laurent.svg",
+          "alt": "Avatar Laurent",
+          "slot": "photo",
+          "tintable": true,
+          "source": "DiceBear (libre de droits)"
+        },
+        {
+          "file": "assets/images/banks/avatars-modern/Elodie.svg",
+          "alt": "Avatar Élodie",
+          "slot": "photo",
+          "tintable": true,
+          "source": "DiceBear (libre de droits)"
+        }
+      ]
     }
   ]
 }

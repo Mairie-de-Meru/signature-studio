@@ -46,7 +46,8 @@ const DEFAULT_STATE = {
     fontSize: 13, nameSize: 17,
     primary: "#1a5fb4", secondary: "#5b6e84", text: "#333333",
     align: "left", spacing: 6, photoSize: 72, logoSize: 100, iconSize: 22,
-    bannerTextColor: "#ffffff", bannerTextSize: 22, bannerPos: "center", bannerAlign: "center"
+    bannerTextColor: "#ffffff", bannerTextSize: 22, bannerPos: "center", bannerAlign: "center",
+    avatarColor: "#2358c7"
   }
 };
 
@@ -181,7 +182,7 @@ function buildParts(st, exportMode) {
 
   const ps = s.photoSize, ls = s.logoSize;
   parts.photo = (v.photo && d.photo)
-    ? `<img${at("photo")} src="${esc(img("photo"))}" alt="Photo de ${esc(fullName) || "profil"}" width="${ps}" height="${ps}" style="display:block;width:${ps}px;height:${ps}px;border-radius:50%;object-fit:cover;">`
+    ? `<img${at("photo")} src="${esc(getAvatarSrc(exportMode))}" alt="Photo de ${esc(fullName) || "profil"}" width="${ps}" height="${ps}" style="display:block;width:${ps}px;height:${ps}px;border-radius:50%;object-fit:cover;">`
     : "";
   parts.logo = (v.logo && d.logo)
     ? `<img${at("logo")} src="${esc(img("logo"))}" alt="Logo ${esc(d.company) || "entreprise"}" width="${ls}" style="display:block;width:${ls}px;height:auto;max-width:180px;">`
@@ -318,6 +319,7 @@ function renderAll() {
   renderImageSlots();
   renderWarnings();
   updateBannerComposite();
+  updateAvatarComposite();
 }
 
 function renderPreview() {
@@ -346,7 +348,7 @@ function renderTemplateList() {
 
 function renderImageSlots() {
   const setImg = (id, val) => { const el = $(id); if (el) el.src = val || ""; };
-  setImg("#slot-photo", state.data.photo);
+  setImg("#slot-photo", getAvatarSrc(false));
   setImg("#slot-logo", state.data.logo);
   setImg("#slot-banner", getBannerSrc(false));
 }
@@ -436,6 +438,61 @@ async function updateBannerComposite() {
       bannerCompositeWarned = true;
       showToast("Aperçu bannière indisponible sur ce navigateur.", "error");
     }
+  }
+  renderPreview();
+}
+
+let avatarComposite = null;
+let avatarCompositeWarned = false;
+
+function findBankImage(path) {
+  if (!path) return null;
+  for (const cat of imageBank.categories || []) {
+    for (const im of cat.images || []) {
+      if (im.file === path) return im;
+    }
+  }
+  return null;
+}
+
+function getAvatarSrc(exportMode) {
+  const photo = state.data.photo;
+  if (!photo) return "";
+  const img = findBankImage(photo);
+  if (img && img.tintable && avatarComposite) return avatarComposite;
+  return exportMode ? resolveImgUrl(photo) : photo;
+}
+
+function hexToRgb(hex) {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex || "#2358c7");
+  return m ? { r: parseInt(m[1],16), g: parseInt(m[2],16), b: parseInt(m[3],16) } : { r: 35, g: 88, b: 199 };
+}
+
+async function updateAvatarComposite() {
+  const photo = state.data.photo;
+  avatarComposite = null;
+  const img = photo ? findBankImage(photo) : null;
+  if (!img || !img.tintable) { renderPreview(); return; }
+  const src = resolveImgUrl(photo);
+  const sz = Number(state.style.photoSize) || 72;
+  try {
+    const im = await loadImage(src);
+    const canvas = document.createElement("canvas");
+    canvas.width = sz; canvas.height = sz;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(im, 0, 0, sz, sz);
+    const data = ctx.getImageData(0, 0, sz, sz);
+    const c = hexToRgb(state.style.avatarColor);
+    for (let i = 0; i < data.data.length; i += 4) {
+      if (data.data[i + 3] > 0) {
+        data.data[i] = c.r; data.data[i + 1] = c.g; data.data[i + 2] = c.b;
+      }
+    }
+    ctx.putImageData(data, 0, 0);
+    avatarComposite = canvas.toDataURL("image/png");
+  } catch {
+    avatarComposite = null;
+    if (!avatarCompositeWarned) { avatarCompositeWarned = true; showToast("Aperçu avatar indisponible.", "error"); }
   }
   renderPreview();
 }

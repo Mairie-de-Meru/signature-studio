@@ -14,6 +14,7 @@ const CATS = [
   { id: "bureaux",    label: "Bureaux & Travail", query: "modern office workspace",      slot: "banner", n: 6 },
   { id: "technologie", label: "Technologie",       query: "technology circuit network",  slot: "banner", n: 6 },
   { id: "transports", label: "Transports",         query: "train station public transport", slot: "banner", n: 6 },
+  { id: "monochromes", label: "Avatars monochromes", query: "silhouette portrait monochrome monogram", slot: "photo", n: 10, tintable: true },
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -57,6 +58,7 @@ async function fetchCat(cat) {
         file: `assets/images/banks/${cat.id}/${fname}`,
         alt: (ii.extmetadata?.ObjectName?.value || p.title.replace(/^File:/, "")).slice(0, 80),
         slot: cat.slot,
+        tintable: !!cat.tintable,
         license: lic,
         source: ii.descriptionurl,
       });

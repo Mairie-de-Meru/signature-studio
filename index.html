@@ -54,7 +54,7 @@
         <label for="import-file" class="btn btn-secondary btn-sm" title="Importer une image depuis votre ordinateur (PNG, JPG, SVG, GIF, WebP — 400 Ko max).">
           + Importer une image
         </label>
-        <input type="file" id="import-file" accept="image/png,image/jpeg,image/svg+xml,image/gif,image/webp" hidden>
+        <input type="file" id="import-file" accept="image/*" hidden>
       </div>
     </section>
 
@@ -144,11 +144,16 @@
 
         <fieldset>
           <legend>Images utilisées</legend>
-          <p class="hint">Sélectionnez une image dans la banque (étape 1), puis choisissez son usage.</p>
+          <p class="hint">Cliquez sur une image de la banque pour l'appliquer directement à son emplacement.</p>
           <div class="field-row image-slot">
             <span class="label">Photo</span>
             <img id="slot-photo" class="slot-thumb" src="" alt="Photo actuelle">
             <input type="checkbox" class="switch" data-show="photo" checked aria-label="Afficher la photo" title="Afficher / masquer">
+          </div>
+          <div class="field-row">
+            <label for="s-avatarColor">Couleur avatar</label>
+            <input type="color" id="s-avatarColor" data-style="avatarColor" title="S'applique aux avatars monochromes (illustrés).">
+            <span class="hint" style="margin:0;">Avatars monochromes uniquement</span>
           </div>
           <div class="field-row image-slot">
             <span class="label">Logo</span>
