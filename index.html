@@ -6,20 +6,9 @@
   <title>Signature Studio — Créateur de signatures e-mail</title>
   <meta name="description" content="Concevez et exportez des signatures e-mail professionnelles. Application 100% statique, sans serveur ni installation.">
   <meta name="theme-color" content="#2358c7">
-  <script>
-    (function () {
-      try {
-        var saved = localStorage.getItem("signature-studio:theme:v1");
-        var dark = saved === "dark" || (!saved && matchMedia("(prefers-color-scheme: dark)").matches);
-        document.documentElement.dataset.theme = dark ? "dark" : "light";
-      } catch (e) {}
-    })();
-  </script>
-  <link rel="stylesheet" href="styles.css?v=20260731-1">
+  <link rel="stylesheet" href="styles.css?v=20260731-2">
 </head>
 <body>
-
-  <a class="skip-link" href="#contenu">Aller au contenu</a>
 
   <header class="app-header">
     <div class="brand">
@@ -30,30 +19,18 @@
       </div>
     </div>
     <div class="header-actions">
-      <a href="detourage.html" class="btn btn-ghost btn-sm" title="Outil de détourage auto de logos (IA, dans le navigateur)">✂ Détourage</a>
       <button type="button" id="btn-reset-style" class="btn btn-ghost btn-sm"
               title="Remet la police, les couleurs et les espacements par défaut sans perdre vos informations.">
         ↺ Réinitialiser le style
       </button>
-      <button type="button" id="btn-theme" class="btn btn-ghost btn-sm" title="Passer en mode sombre" aria-pressed="false">🌙</button>
-      <div class="dropdown">
-        <button type="button" id="btn-header-menu" class="btn btn-ghost btn-sm"
-                title="Plus d'actions" aria-haspopup="true" aria-expanded="false">
-          ⋯
-        </button>
-        <ul id="header-menu-list" class="dropdown-list is-hidden" role="menu" aria-label="Autres actions">
-          <li role="menuitem">
-            <button type="button" id="btn-reset-all" class="menu-danger"
-                    title="Efface toutes les données et personnalisations.">
-              🗑 Tout effacer
-            </button>
-          </li>
-        </ul>
-      </div>
+      <button type="button" id="btn-reset-all" class="btn btn-ghost btn-sm btn-danger"
+              title="Efface toutes les données et personnalisations.">
+        Tout effacer
+      </button>
     </div>
   </header>
 
-  <main class="layout" id="contenu">
+  <main class="layout">
 
     <!-- ========== ZONE 1 : modèles + banque d'images ========== -->
     <section class="panel panel-left" aria-labelledby="titre-modeles">
@@ -69,19 +46,15 @@
       <div id="template-list" class="template-list" role="radiogroup" aria-label="Choix du modèle de signature"></div>
 
       <h3 class="subhead">Banque d'images</h3>
-      <p class="hint">Cliquez sur une image pour l'appliquer à son emplacement.</p>
-      <div class="bank-search">
-        <input type="search" id="bank-search" placeholder="Rechercher une image…" aria-label="Rechercher une image dans la banque">
-      </div>
+      <p class="hint">Cliquez sur une image pour la prévisualiser.</p>
       <nav id="bank-tabs" class="bank-tabs" aria-label="Catégories d'images"></nav>
       <div id="bank-grid" class="bank-grid" aria-live="polite"></div>
 
       <div class="bank-import">
-        <label for="import-file" class="btn btn-secondary btn-sm" title="Importer une image depuis votre ordinateur (PNG, JPG, SVG, GIF, WebP — 400 Ko max). Stockée localement dans votre navigateur uniquement (localStorage), jamais envoyée sur un serveur.">
+        <label for="import-file" class="btn btn-secondary btn-sm" title="Importer une image depuis votre ordinateur (PNG, JPG, SVG, GIF, WebP — 400 Ko max).">
           + Importer une image
         </label>
         <input type="file" id="import-file" accept="image/*" hidden>
-        <p class="bank-import-hint">Stockage local uniquement — vos images restent dans votre navigateur (localStorage), elles ne sont jamais envoyées sur un serveur.</p>
       </div>
     </section>
 
@@ -97,15 +70,8 @@
 
       <form id="signature-form" autocomplete="on">
 
-        <fieldset id="fs-identite">
-          <legend>
-            <button type="button" class="accordion-toggle" aria-expanded="true" aria-controls="fs-identite-body">
-              <span class="accordion-title">Identité</span>
-              <span class="accordion-chevron" aria-hidden="true">▾</span>
-            </button>
-          </legend>
-          <div class="accordion-body" id="fs-identite-body">
-          <div class="accordion-inner">
+        <fieldset>
+          <legend>Identité</legend>
           <div class="field-row">
             <label for="f-firstName">Prénom</label>
             <input type="text" id="f-firstName" data-field="firstName" placeholder="Camille">
@@ -124,19 +90,10 @@
             <input type="text" id="f-company" data-field="company" placeholder="Lumea Studio">
             <input type="checkbox" class="switch" data-show="company" checked aria-label="Afficher l'entreprise" title="Afficher / masquer">
           </div>
-          </div>
-          </div>
         </fieldset>
 
-        <fieldset id="fs-coordonnees">
-          <legend>
-            <button type="button" class="accordion-toggle" aria-expanded="true" aria-controls="fs-coordonnees-body">
-              <span class="accordion-title">Coordonnées</span>
-              <span class="accordion-chevron" aria-hidden="true">▾</span>
-            </button>
-          </legend>
-          <div class="accordion-body" id="fs-coordonnees-body">
-          <div class="accordion-inner">
+        <fieldset>
+          <legend>Coordonnées</legend>
           <div class="field-row">
             <label for="f-phone">Téléphone</label>
             <input type="tel" id="f-phone" data-field="phone" placeholder="+33 6 12 34 56 78">
@@ -157,20 +114,12 @@
             <input type="text" id="f-address" data-field="address" placeholder="12 rue des Lilas, 75011 Paris">
             <input type="checkbox" class="switch" data-show="address" checked aria-label="Afficher l'adresse" title="Afficher / masquer">
           </div>
-          </div>
-          </div>
         </fieldset>
 
-        <fieldset id="fs-social">
-          <legend>
-            <button type="button" class="accordion-toggle" aria-expanded="true" aria-controls="fs-social-body">
-              <span class="accordion-title">Réseaux sociaux</span>
-              <span class="accordion-chevron" aria-hidden="true">▾</span>
-            </button>
+        <fieldset>
+          <legend>Réseaux sociaux
             <input type="checkbox" class="switch" data-show="social" checked aria-label="Afficher les réseaux sociaux" title="Afficher / masquer tous les réseaux">
           </legend>
-          <div class="accordion-body" id="fs-social-body">
-          <div class="accordion-inner">
           <div class="field-row">
             <label for="f-linkedin">LinkedIn</label>
             <input type="url" id="f-linkedin" data-field="linkedin" placeholder="https://www.linkedin.com/in/…">
@@ -191,24 +140,14 @@
             <label for="f-youtube">YouTube</label>
             <input type="url" id="f-youtube" data-field="youtube" placeholder="https://www.youtube.com/@…">
           </div>
-          </div>
-          </div>
         </fieldset>
 
-        <fieldset id="fs-images">
-          <legend>
-            <button type="button" class="accordion-toggle" aria-expanded="true" aria-controls="fs-images-body">
-              <span class="accordion-title">Images utilisées</span>
-              <span class="accordion-chevron" aria-hidden="true">▾</span>
-            </button>
-          </legend>
-          <div class="accordion-body" id="fs-images-body">
-          <div class="accordion-inner">
+        <fieldset>
+          <legend>Images utilisées</legend>
           <p class="hint">Cliquez sur une image de la banque pour l'appliquer directement à son emplacement.</p>
           <div class="field-row image-slot">
             <span class="label">Photo</span>
             <img id="slot-photo" class="slot-thumb" src="" alt="Photo actuelle">
-            <button type="button" id="slot-photo-empty" class="slot-placeholder" data-bank="avatars" hidden>👤 Choisir une photo</button>
             <input type="checkbox" class="switch" data-show="photo" checked aria-label="Afficher la photo" title="Afficher / masquer">
           </div>
           <div class="field-row">
@@ -219,28 +158,17 @@
           <div class="field-row image-slot">
             <span class="label">Logo</span>
             <img id="slot-logo" class="slot-thumb" src="" alt="Logo actuel">
-            <button type="button" id="slot-logo-empty" class="slot-placeholder" data-bank="logos" hidden>🏢 Choisir un logo</button>
             <input type="checkbox" class="switch" data-show="logo" checked aria-label="Afficher le logo" title="Afficher / masquer">
           </div>
           <div class="field-row image-slot">
             <span class="label">Bannière</span>
             <img id="slot-banner" class="slot-thumb slot-thumb-wide" src="" alt="Bannière actuelle">
-            <button type="button" id="slot-banner-empty" class="slot-placeholder" data-bank="bannieres" hidden>🖼 Choisir une bannière</button>
             <input type="checkbox" class="switch" data-show="banner" checked aria-label="Afficher la bannière" title="Afficher / masquer">
-          </div>
-          </div>
           </div>
         </fieldset>
 
-        <fieldset id="fs-banniere">
-          <legend>
-            <button type="button" class="accordion-toggle" aria-expanded="true" aria-controls="fs-banniere-body">
-              <span class="accordion-title">Texte sur la bannière</span>
-              <span class="accordion-chevron" aria-hidden="true">▾</span>
-            </button>
-          </legend>
-          <div class="accordion-body" id="fs-banniere-body">
-          <div class="accordion-inner">
+        <fieldset>
+          <legend>Texte sur la bannière</legend>
           <p class="hint">Incrustez un titre et un sous-titre directement dans l'image bannière.</p>
           <div class="field-row">
             <label for="f-bannerTitle">Titre</label>
@@ -275,37 +203,20 @@
               <option value="right">Droite</option>
             </select>
           </div>
-          </div>
-          </div>
         </fieldset>
 
-        <fieldset id="fs-legal">
-          <legend>
-            <button type="button" class="accordion-toggle" aria-expanded="true" aria-controls="fs-legal-body">
-              <span class="accordion-title">Mention légale</span>
-              <span class="accordion-chevron" aria-hidden="true">▾</span>
-            </button>
+        <fieldset>
+          <legend>Mention légale
             <input type="checkbox" class="switch" data-show="legal" checked aria-label="Afficher la mention" title="Afficher / masquer">
           </legend>
-          <div class="accordion-body" id="fs-legal-body">
-          <div class="accordion-inner">
           <div class="field-row">
             <textarea id="f-legal" data-field="legal" rows="2" aria-label="Texte légal ou environnemental"
               placeholder="Ex. : Pensez à l'environnement avant d'imprimer ce message."></textarea>
           </div>
-          </div>
-          </div>
         </fieldset>
 
-        <fieldset id="fs-style">
-          <legend>
-            <button type="button" class="accordion-toggle" aria-expanded="true" aria-controls="fs-style-body">
-              <span class="accordion-title">Style</span>
-              <span class="accordion-chevron" aria-hidden="true">▾</span>
-            </button>
-          </legend>
-          <div class="accordion-body" id="fs-style-body">
-          <div class="accordion-inner">
+        <fieldset>
+          <legend>Style</legend>
           <div class="field-row">
             <label for="s-font">Police</label>
             <select id="s-font" data-style="font" title="Polices compatibles avec tous les logiciels de messagerie.">
@@ -373,8 +284,6 @@
             <input type="range" id="s-iconSize" data-style="iconSize" min="16" max="32" step="2">
             <output for="s-iconSize" id="out-iconSize">22px</output>
           </div>
-          </div>
-          </div>
         </fieldset>
       </form>
     </section>
@@ -420,18 +329,10 @@
                   title="Copie le code HTML brut de la signature.">
             Copier le HTML
           </button>
-          <div class="dropdown">
-            <button type="button" id="btn-download" class="btn btn-secondary"
-                    title="Télécharger la signature (HTML, image PNG ou brouillon EML pour votre client de messagerie)."
-                    aria-haspopup="true" aria-expanded="false">
-              Télécharger ▾
-            </button>
-            <ul id="download-list" class="dropdown-list is-hidden" role="menu" aria-label="Formats de téléchargement">
-              <li role="menuitem"><button type="button" data-dl="html">Fichier HTML</button></li>
-              <li role="menuitem"><button type="button" data-dl="png">Image PNG</button></li>
-              <li role="menuitem"><button type="button" data-dl="eml">Brouillon .eml (Mail, Outlook…)</button></li>
-            </ul>
-          </div>
+          <button type="button" id="btn-download" class="btn btn-secondary"
+                  title="Télécharge un fichier signature.html autonome.">
+            Télécharger
+          </button>
         </div>
         <p class="hint-info">
           Les images sont automatiquement converties en URLs absolues hébergées sur ce site :
@@ -449,7 +350,7 @@
     <img id="zoom-img" src="" alt="">
   </div>
 
-  <script src="assets/images-data.js?v=20260731-1"></script>
-  <script src="app.js?v=20260731-1"></script>
+  <script src="assets/images-data.js?v=20260731-2"></script>
+  <script src="app.js?v=20260731-2"></script>
 </body>
 </html>

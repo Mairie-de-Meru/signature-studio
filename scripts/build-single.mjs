@@ -31,10 +31,10 @@ console.log("Images inlined :", inlined);
 const bankJs = "window.IMAGE_BANK = " + JSON.stringify(embedded) + ";";
 
 let out = html;
-out = out.replace('<link rel="stylesheet" href="styles.css?v=20260731-1">',
+out = out.replace('<link rel="stylesheet" href="styles.css?v=20260731-2">',
                   "<style>\n" + css + "\n</style>");
-out = out.replace('<script src="assets/images-data.js?v=20260731-1"></script>', "");
-out = out.replace('<script src="app.js?v=20260731-1"></script>',
+out = out.replace('<script src="assets/images-data.js?v=20260731-2"></script>', "");
+out = out.replace('<script src="app.js?v=20260731-2"></script>',
                   "<script>\n" + bankJs + "\n</script>\n<script>\n" + js + "\n</script>");
 
 const outPath = path.join(ROOT, "index-single.html");
