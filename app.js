@@ -683,7 +683,7 @@ let currentCategory = "entreprise";
 
 async function loadImageBank() {
   try {
-    const res = await fetch(BASE_URL + "assets/images.json");
+    const res = await fetch(BASE_URL + "assets/images.json?v=20260731-1");
     if (!res.ok) throw new Error("HTTP " + res.status);
     imageBank = await res.json();
   } catch {
