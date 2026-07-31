@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Détourage — Signature Studio</title>
+<meta name="theme-color" content="#2358c7">
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem("signature-studio:theme:v1");
+      var dark = saved === "dark" || (!saved && matchMedia("(prefers-color-scheme: dark)").matches);
+      document.documentElement.dataset.theme = dark ? "dark" : "light";
+    } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Styles spécifiques au détourage */
+  .cut-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: var(--sp-4);
+    padding: var(--sp-4);
+    max-width: 1500px;
+    margin: 0 auto;
+    --check-a: #e8e8e8;
+    --check-b: #f4f4f4;
+  }
+  :root[data-theme="dark"] .cut-layout { --check-a: #2c3644; --check-b: #1a212b; }
+  .cut-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    align-items: center;
+    margin-bottom: var(--sp-3);
+  }
+  .cut-tool-group {
+    display: flex;
+    gap: var(--sp-1);
+    padding: var(--sp-1);
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-sm);
+  }
+  .tool-btn {
+    appearance: none;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--c-text-soft);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.35rem 0.7rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tool-btn:hover { background: var(--c-surface); border-color: var(--c-border); }
+  .tool-btn.is-active {
+    background: var(--c-accent);
+    border-color: var(--c-accent);
+    color: #fff;
+  }
+  .tool-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .cut-canvas-wrap {
+    position: relative;
+    background:
+      linear-gradient(45deg, var(--check-a) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--check-a) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--check-a) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--check-a) 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-color: var(--check-b);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-md);
+    overflow: auto;
+    max-height: 70vh;
+    min-height: 320px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: var(--sp-3);
+  }
+  .cut-canvas-wrap.is-dragover {
+    border-color: var(--c-accent);
+    box-shadow: 0 0 0 3px var(--c-accent-soft);
+  }
+  #cut-canvas { display: block; max-width: 100%; cursor: crosshair; }
+  .cut-empty {
+    text-align: center;
+    color: var(--c-muted);
+    padding: var(--sp-6);
+    margin: auto;
+  }
+  .cut-empty .icon { font-size: 3rem; opacity: 0.4; }
+  .cut-panel {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-lg);
+    padding: var(--sp-4);
+    max-height: 78vh;
+    overflow-y: auto;
+  }
+  .cut-panel h2 { font-size: 1rem; margin-bottom: var(--sp-3); }
+  .cut-progress {
+    margin: var(--sp-2) 0;
+    padding: var(--sp-2) var(--sp-3);
+    background: var(--c-accent-soft);
+    border-left: 3px solid var(--c-accent);
+    border-radius: var(--r-sm);
+    font-size: 0.82rem;
+    color: var(--c-accent-dark);
+  }
+  .progress-bar {
+    margin-top: 6px;
+    height: 6px;
+    background: var(--c-border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-bar > span {
+    display: block;
+    height: 100%;
+    background: var(--c-accent);
+    width: 0%;
+    transition: width 0.2s;
+  }
+  .export-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    margin-top: var(--sp-3);
+  }
+  .export-item {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-2);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-sm);
+    background: var(--c-surface-2);
+  }
+  .export-thumb {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    background:
+      linear-gradient(45deg, var(--check-a) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--check-a) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--check-a) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--check-a) 75%);
+    background-size: 12px 12px;
+    background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
+    background-color: var(--check-b);
+    border-radius: 4px;
+    border: 1px solid var(--c-border);
+  }
+  .export-meta { flex: 1; min-width: 0; }
+  .export-name { font-size: 0.85rem; font-weight: 600; color: var(--c-text); }
+  .export-info { font-size: 0.72rem; color: var(--c-muted); }
+  .export-actions-row { display: flex; gap: 4px; }
+  .export-actions-row button {
+    appearance: none;
+    border: 1px solid var(--c-border);
+    background: var(--c-surface);
+    color: var(--c-text-soft);
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  .export-actions-row button:hover { border-color: var(--c-accent); color: var(--c-accent); }
+  .grid-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+    padding: var(--sp-3);
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-border);
+    border-radius: var(--r-sm);
+    margin-top: var(--sp-3);
+  }
+  .grid-controls label { font-size: 0.8rem; font-weight: 600; color: var(--c-text-soft); }
+  .grid-controls input[type="number"] {
+    width: 70px;
+    padding: 4px 6px;
+    border: 1px solid var(--c-border-strong);
+    border-radius: 4px;
+    font-size: 0.85rem;
+  }
+  .grid-row { display: flex; gap: var(--sp-3); align-items: center; }
+  .cut-zones-overlay {
+    position: absolute;
+    pointer-events: none;
+    border: 2px dashed var(--c-accent);
+    background: rgba(35, 88, 199, 0.12);
+  }
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="brand">
+    <div class="brand-mark">✂</div>
+    <div class="brand-text">
+      <h1>Détourage</h1>
+      <p class="tagline">Signature Studio — découpe et détourage auto de logos</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button type="button" id="btn-theme" class="btn btn-ghost btn-sm" title="Passer en mode sombre" aria-pressed="false">🌙</button>
+    <a href="index.html" class="btn btn-ghost btn-sm">← Retour signatures</a>
+  </div>
+</header>
+
+<main class="cut-layout">
+  <section>
+    <div class="cut-toolbar">
+      <div class="cut-tool-group" role="group" aria-label="Mode de sélection">
+        <button type="button" class="tool-btn is-active" data-mode="rect">▭ Rectangle</button>
+        <button type="button" class="tool-btn" data-mode="grid">▦ Grille</button>
+      </div>
+      <button type="button" id="btn-load" class="btn btn-secondary btn-sm">📁 Charger image</button>
+      <input type="file" id="cut-file" accept="image/*" hidden>
+      <button type="button" id="btn-cut" class="btn btn-primary btn-sm" disabled>✂ Détourer la zone</button>
+      <button type="button" id="btn-cut-all" class="btn btn-primary btn-sm" disabled>✂ Détourer toute la grille</button>
+      <button type="button" id="btn-crop" class="btn btn-secondary btn-sm" disabled>⊞ Juste découper (sans IA)</button>
+      <button type="button" id="btn-crop-all" class="btn btn-secondary btn-sm" disabled>⊞ Découper la grille (sans IA)</button>
+      <button type="button" id="btn-erase" class="btn btn-secondary btn-sm" disabled>🧽 Gommer fond</button>
+      <button type="button" id="btn-clear" class="btn btn-ghost btn-sm" disabled>↺ Effacer sélection</button>
+    </div>
+
+    <div class="cut-canvas-wrap" id="canvas-wrap">
+      <div class="cut-empty" id="cut-empty">
+        <div class="icon">🖼️</div>
+        <p><strong>Déposez une image ici</strong><br>ou cliquez sur « Charger image »</p>
+        <p style="font-size:0.78rem;margin-top:8px;">PNG, JPG, WebP — traitement local, rien n'est envoyé.</p>
+      </div>
+      <canvas id="cut-canvas" hidden></canvas>
+    </div>
+
+    <div class="grid-controls" id="grid-controls" hidden>
+      <strong style="font-size:0.85rem;">Configuration de la grille</strong>
+      <div class="grid-row">
+        <label>Colonnes</label>
+        <input type="number" id="grid-cols" min="1" max="10" value="3">
+        <label>Lignes</label>
+        <input type="number" id="grid-rows" min="1" max="10" value="3">
+      </div>
+      <div class="grid-row">
+        <label>Décalage X</label>
+        <input type="number" id="grid-offset-x" value="0" step="2">
+        <label>Décalage Y</label>
+        <input type="number" id="grid-offset-y" value="0" step="2">
+      </div>
+      <div class="grid-row">
+        <label>Espacement</label>
+        <input type="number" id="grid-gap" value="0" min="0" step="2">
+        <label>Marge</label>
+        <input type="number" id="grid-margin" value="0" min="0" step="2">
+      </div>
+      <div class="grid-row">
+        <button type="button" id="btn-grid-apply" class="btn btn-secondary btn-sm">Appliquer</button>
+        <button type="button" id="btn-grid-nudge-left" class="btn btn-ghost btn-sm" title="Décaler toute la grille à gauche">←</button>
+        <button type="button" id="btn-grid-nudge-right" class="btn btn-ghost btn-sm" title="Décaler toute la grille à droite">→</button>
+        <button type="button" id="btn-grid-nudge-up" class="btn btn-ghost btn-sm" title="Décaler toute la grille en haut">↑</button>
+        <button type="button" id="btn-grid-nudge-down" class="btn btn-ghost btn-sm" title="Décaler toute la grille en bas">↓</button>
+      </div>
+      <p style="margin:0;font-size:0.78rem;color:var(--c-muted);">
+        Astuce : cliquez sur une cellule pour l'ajuster individuellement (taille et position),<br>
+        ou faites glisser la grille entière avec la souris sur l'image.
+      </p>
+    </div>
+
+    <div class="grid-controls" id="cell-editor" hidden style="margin-top:8px;">
+      <strong style="font-size:0.85rem;">Cellule #<span id="cell-editor-idx"></span></strong>
+      <div class="grid-row">
+        <label>X</label>
+        <input type="number" id="cell-x" step="1">
+        <label>Y</label>
+        <input type="number" id="cell-y" step="1">
+      </div>
+      <div class="grid-row">
+        <label>Largeur</label>
+        <input type="number" id="cell-w" step="1" min="2">
+        <label>Hauteur</label>
+        <input type="number" id="cell-h" step="1" min="2">
+      </div>
+      <div class="grid-row">
+        <button type="button" id="btn-cell-delete" class="btn btn-danger btn-sm">Supprimer cellule</button>
+        <button type="button" id="btn-cell-done" class="btn btn-secondary btn-sm">OK</button>
+      </div>
+    </div>
+
+    <div class="cut-progress is-hidden" id="cut-progress">
+      <div id="cut-progress-text">Initialisation…</div>
+      <div class="progress-bar"><span id="cut-progress-bar"></span></div>
+    </div>
+  </section>
+
+  <aside class="cut-panel">
+    <h2>Exports de la session</h2>
+    <p class="hint" id="exports-hint">Aucun export pour l'instant.</p>
+    <div class="export-list" id="export-list"></div>
+    <div id="bulk-actions" hidden>
+      <button type="button" id="btn-download-all" class="btn btn-primary" style="width:100%;margin-top:12px;">⬇ Tout télécharger (.zip)</button>
+    </div>
+  </aside>
+</main>
+
+<div id="toast" class="toast is-hidden" role="status" aria-live="polite"></div>
+
+<!-- JSZip pour l'export groupé -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+<script type="module">
+import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0';
+env.allowLocalModels = false;
+env.backends.onnx.wasm.proxy = false;
+
+const $ = (s) => document.querySelector(s);
+const toast = (msg, type = "") => {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.className = "toast" + (type ? " is-" + type : "");
+  setTimeout(() => t.classList.add("is-hidden"), 2500);
+};
+
+// ---- State
+let sourceImg = null;        // HTMLImageElement
+let baseCanvas = null;       // canvas avec l'image source
+let mode = "rect";           // "rect" | "grid"
+let rect = null;             // {x,y,w,h} en pixels canvas
+let gridCells = [];          // [{x,y,w,h}]
+let exports = [];            // [{name, blob, url, w, h}]
+let segmenter = null;        // pipeline image-segmentation
+let isProcessing = false;
+let isDrawing = false;
+let dragStart = null;
+
+// ---- DOM
+const canvas = $("#cut-canvas");
+const ctx = canvas.getContext("2d");
+const wrap = $("#canvas-wrap");
+const empty = $("#cut-empty");
+const progressBox = $("#cut-progress");
+const progressText = $("#cut-progress-text");
+const progressBar = $("#cut-progress-bar");
+
+// ---- Chargement d'image
+$("#btn-load").addEventListener("click", () => $("#cut-file").click());
+$("#cut-file").addEventListener("change", (e) => { if (e.target.files[0]) loadImage(e.target.files[0]); e.target.value=""; });
+wrap.addEventListener("dragover", (e) => { e.preventDefault(); wrap.classList.add("is-dragover"); });
+wrap.addEventListener("dragleave", () => wrap.classList.remove("is-dragover"));
+wrap.addEventListener("drop", (e) => {
+  e.preventDefault();
+  wrap.classList.remove("is-dragover");
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith("image/")) loadImage(f);
+});
+
+function loadImage(file) {
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    sourceImg = img;
+    // Limiter la taille pour la perf
+    const MAX = 1400;
+    let w = img.naturalWidth, h = img.naturalHeight;
+    if (w > MAX || h > MAX) {
+      const r = Math.min(MAX / w, MAX / h);
+      w = Math.round(w * r); h = Math.round(h * r);
+    }
+    canvas.width = w; canvas.height = h;
+    canvas.hidden = false;
+    empty.hidden = true;
+    ctx.drawImage(img, 0, 0, w, h);
+    rect = null; gridCells = [];
+    $("#btn-erase").disabled = false;
+    $("#btn-clear").disabled = false;
+    toast("Image chargée (" + w + "×" + h + ")", "success");
+  };
+  img.onerror = () => toast("Image invalide.", "error");
+  img.src = url;
+}
+
+// ---- Mode
+document.querySelectorAll('[data-mode]').forEach(b => {
+  b.addEventListener("click", () => {
+    document.querySelectorAll('[data-mode]').forEach(x => x.classList.remove("is-active"));
+    b.classList.add("is-active");
+    mode = b.dataset.mode;
+    rect = null; gridCells = [];
+    $("#grid-controls").hidden = mode !== "grid";
+    if (mode !== "grid") hideCellEditor();
+    redraw();
+    updateCutButtons();
+  });
+});
+
+// ---- Sélection rectangle / grille (dessin à la souris, un seul jeu de listeners)
+canvas.addEventListener("mousedown", (e) => {
+  if (!sourceImg || isProcessing) return;
+  const p = canvasPos(e);
+  if (mode === "rect") {
+    isDrawing = true;
+    dragStart = p;
+    selectedCellIdx = -1;
+    hideCellEditor();
+  } else if (mode === "grid") {
+    // Clic sur une cellule → ouvre l'éditeur
+    const idx = cellAt(p.x, p.y);
+    if (idx >= 0) {
+      selectedCellIdx = idx;
+      showCellEditor(idx);
+      redraw();
+      return;
+    }
+    // Sinon → drag de toute la grille
+    isDraggingGrid = true;
+    gridDragStart = p;
+    gridOffsetDragStart = { x: +$("#grid-offset-x").value || 0, y: +$("#grid-offset-y").value || 0 };
+  }
+});
+canvas.addEventListener("mousemove", (e) => {
+  if (!sourceImg) return;
+  const p = canvasPos(e);
+  if (mode === "rect" && isDrawing) {
+    rect = {
+      x: Math.min(dragStart.x, p.x),
+      y: Math.min(dragStart.y, p.y),
+      w: Math.abs(p.x - dragStart.x),
+      h: Math.abs(p.y - dragStart.y)
+    };
+    redraw();
+  } else if (mode === "grid" && isDraggingGrid) {
+    const dx = p.x - gridDragStart.x;
+    const dy = p.y - gridDragStart.y;
+    $("#grid-offset-x").value = Math.round(gridOffsetDragStart.x + dx);
+    $("#grid-offset-y").value = Math.round(gridOffsetDragStart.y + dy);
+    gridCells = buildGridCells();
+    redraw();
+  }
+});
+canvas.addEventListener("mouseup", () => {
+  isDrawing = false; isDraggingGrid = false;
+  updateCutButtons();
+});
+canvas.addEventListener("mouseleave", () => { isDrawing = false; isDraggingGrid = false; });
+
+function updateCutButtons() {
+  $("#btn-cut").disabled = !(mode === "rect" && rect && rect.w > 4 && rect.h > 4) || isProcessing;
+  $("#btn-cut-all").disabled = !(mode === "grid" && gridCells.length > 0) || isProcessing;
+  $("#btn-crop").disabled = !(mode === "rect" && rect && rect.w > 4 && rect.h > 4) || isProcessing;
+  $("#btn-crop-all").disabled = !(mode === "grid" && gridCells.length > 0) || isProcessing;
+}
+
+// ---- Grille : application des cols/rows + offset + gap + margin
+let selectedCellIdx = -1;
+let isDraggingGrid = false;
+let gridDragStart = null;
+let gridOffsetDrag = { x: 0, y: 0 }; // décalage ajouté pendant le drag
+let gridOffsetDragStart = { x: 0, y: 0 };
+
+function buildGridCells() {
+  const cols = Math.max(1, +$("#grid-cols").value || 1);
+  const rows = Math.max(1, +$("#grid-rows").value || 1);
+  const ox = +$("#grid-offset-x").value || 0;
+  const oy = +$("#grid-offset-y").value || 0;
+  const gap = Math.max(0, +$("#grid-gap").value || 0);
+  const margin = Math.max(0, +$("#grid-margin").value || 0);
+  const availW = canvas.width - 2 * margin - (cols - 1) * gap;
+  const availH = canvas.height - 2 * margin - (rows - 1) * gap;
+  const cw = Math.max(8, availW / cols);
+  const ch = Math.max(8, availH / rows);
+  const cells = [];
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++)
+      cells.push({ x: margin + c * (cw + gap) + ox, y: margin + r * (ch + gap) + oy, w: cw, h: ch });
+  return cells;
+}
+$("#btn-grid-apply").addEventListener("click", () => {
+  try {
+    if (!sourceImg) { toast("Chargez d'abord une image", "error"); return; }
+    // Force le mode grille (au cas où on était en rect)
+    if (mode !== "grid") {
+      mode = "grid";
+      document.querySelectorAll('[data-mode]').forEach(x => x.classList.remove("is-active"));
+      const gridBtn = document.querySelector('[data-mode="grid"]');
+      if (gridBtn) gridBtn.classList.add("is-active");
+      $("#grid-controls").hidden = false;
+    }
+    gridOffsetDrag = { x: 0, y: 0 };
+    gridCells = buildGridCells();
+    selectedCellIdx = -1;
+    hideCellEditor();
+    redraw();
+    updateCutButtons();
+    toast("Grille appliquée : " + gridCells.length + " cellules", "success");
+  } catch (e) {
+    toast("Erreur grille : " + e.message, "error");
+    console.error("grid-apply error:", e);
+  }
+});
+
+// ---- Nudge : décale toute la grille (met à jour l'offset et rebuild)
+function nudgeGrid(dx, dy) {
+  if (gridCells.length === 0) return;
+  $("#grid-offset-x").value = (+$("#grid-offset-x").value || 0) + dx;
+  $("#grid-offset-y").value = (+$("#grid-offset-y").value || 0) + dy;
+  gridCells = buildGridCells();
+  redraw();
+}
+["btn-grid-nudge-left", "btn-grid-nudge-right", "btn-grid-nudge-up", "btn-grid-nudge-down"].forEach((id, i) => {
+  $("#" + id).addEventListener("click", () => {
+    const step = 8;
+    const d = [[-step, 0], [step, 0], [0, -step], [0, step]][i];
+    nudgeGrid(d[0], d[1]);
+  });
+});
+
+// ---- Drag de la grille entière et clic cellule : gérés par le listener unifié plus haut
+function canvasPos(e) {
+  const r = canvas.getBoundingClientRect();
+  const sx = canvas.width / r.width, sy = canvas.height / r.height;
+  return { x: (e.clientX - r.left) * sx, y: (e.clientY - r.top) * sy };
+}
+function cellAt(x, y) {
+  for (let i = 0; i < gridCells.length; i++) {
+    const c = gridCells[i];
+    if (x >= c.x && x <= c.x + c.w && y >= c.y && y <= c.y + c.h) return i;
+  }
+  return -1;
+}
+
+// ---- Éditeur de cellule individuelle
+function showCellEditor(idx) {
+  const c = gridCells[idx];
+  $("#cell-editor-idx").textContent = idx + 1;
+  $("#cell-x").value = Math.round(c.x);
+  $("#cell-y").value = Math.round(c.y);
+  $("#cell-w").value = Math.round(c.w);
+  $("#cell-h").value = Math.round(c.h);
+  $("#cell-editor").hidden = false;
+}
+function hideCellEditor() { $("#cell-editor").hidden = true; }
+function applyCellEditor() {
+  if (selectedCellIdx < 0) return;
+  gridCells[selectedCellIdx] = {
+    x: +$("#cell-x").value || 0,
+    y: +$("#cell-y").value || 0,
+    w: Math.max(2, +$("#cell-w").value || 2),
+    h: Math.max(2, +$("#cell-h").value || 2)
+  };
+  redraw();
+}
+["cell-x", "cell-y", "cell-w", "cell-h"].forEach(id => {
+  $("#" + id).addEventListener("input", applyCellEditor);
+});
+$("#btn-cell-delete").addEventListener("click", () => {
+  if (selectedCellIdx < 0) return;
+  gridCells.splice(selectedCellIdx, 1);
+  selectedCellIdx = -1;
+  hideCellEditor();
+  redraw();
+  updateCutButtons();
+});
+$("#btn-cell-done").addEventListener("click", () => {
+  applyCellEditor();
+  selectedCellIdx = -1;
+  hideCellEditor();
+  redraw();
+});
+
+// ---- Handler rectangle : géré par le listener unifié plus haut
+
+
+// ---- Redraw
+function redraw() {
+  if (!sourceImg) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(sourceImg, 0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.lineWidth = 2;
+  ctx.setLineDash([6, 4]);
+  ctx.strokeStyle = "#2358c7";
+  ctx.fillStyle = "rgba(35,88,199,0.15)";
+  if (mode === "rect" && rect) {
+    ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+    ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
+  }
+  if (mode === "grid") {
+    gridCells.forEach((c, i) => {
+      const isSel = i === selectedCellIdx;
+      ctx.fillStyle = isSel ? "rgba(229,85,85,0.25)" : "rgba(35,88,199,0.15)";
+      ctx.strokeStyle = isSel ? "#e55555" : "#2358c7";
+      ctx.lineWidth = isSel ? 3 : 2;
+      ctx.fillRect(c.x, c.y, c.w, c.h);
+      ctx.strokeRect(c.x, c.y, c.w, c.h);
+      ctx.save();
+      ctx.setLineDash([]);
+      ctx.fillStyle = isSel ? "#e55555" : "rgba(35,88,199,0.85)";
+      ctx.font = "bold 14px sans-serif";
+      ctx.fillText(String(i + 1), c.x + 6, c.y + 18);
+      ctx.restore();
+    });
+  }
+  ctx.restore();
+}
+
+$("#btn-clear").addEventListener("click", () => { rect = null; gridCells = []; redraw(); updateCutButtons(); });
+
+// ---- Chargement du modèle (lazy)
+async function loadSegmenter() {
+  if (segmenter) return segmenter;
+  progressBox.classList.remove("is-hidden");
+  setProgress(0, "Chargement du modèle MODNet… (peut prendre 30-60 s la 1ère fois)");
+  try {
+    segmenter = await pipeline("image-segmentation", "Xenova/modnet", {
+      dtype: "q8",
+      progress_callback: (info) => {
+        if (info.status === "progress" && info.progress != null) {
+          setProgress(info.progress, "Téléchargement : " + (info.file || "").split("/").pop() + " — " + info.progress.toFixed(0) + "%");
+        } else if (info.status === "initiate") {
+          setProgress(0, "Initialisation du téléchargement…");
+        } else if (info.status === "ready") {
+          setProgress(100, "Modèle prêt.");
+        }
+      }
+    });
+    setProgress(100, "Modèle prêt.");
+    return segmenter;
+  } catch (e) {
+    setProgress(0, "Échec du chargement du modèle : " + e.message);
+    throw e;
+  }
+}
+function setProgress(p, txt) {
+  progressBar.style.width = p + "%";
+  if (txt) progressText.textContent = txt;
+}
+
+// ---- Détourage d'une zone (pipeline)
+async function cutZone(zone, name) {
+ if (!sourceImg) return null;
+ // Ratio entre l'image source et le canvas d'affichage
+ const scaleX = sourceImg.naturalWidth / canvas.width;
+ const scaleY = sourceImg.naturalHeight / canvas.height;
+ // 1) Zone dans les coordonnées de l'image source (full-res)
+ const z = {
+ x: Math.max(0, Math.floor(zone.x * scaleX)),
+ y: Math.max(0, Math.floor(zone.y * scaleY)),
+ w: Math.min(sourceImg.naturalWidth, Math.max(2, Math.ceil(zone.w * scaleX))),
+ h: Math.min(sourceImg.naturalHeight, Math.max(2, Math.ceil(zone.h * scaleY)))
+ };
+ // Ajuste si on dépasse les bords
+ if (z.x + z.w > sourceImg.naturalWidth) z.w = sourceImg.naturalWidth - z.x;
+ if (z.y + z.h > sourceImg.naturalHeight) z.h = sourceImg.naturalHeight - z.y;
+ if (z.w < 2 || z.h < 2) return null;
+ const zoneCanvas = document.createElement("canvas");
+ zoneCanvas.width = z.w; zoneCanvas.height = z.h;
+ zoneCanvas.getContext("2d").drawImage(sourceImg, z.x, z.y, z.w, z.h, 0, 0, z.w, z.h);
+
+  // 2) Segmentation
+  let mask = null;
+  let segOut = null;
+  try {
+    const seg = await loadSegmenter();
+    segOut = await seg(zoneCanvas);
+    console.log("MODNet output:", segOut);
+    // Plusieurs formats possibles : tableau, objet unique, { mask } ou { data }
+    let candidate = null;
+    if (Array.isArray(segOut) && segOut.length > 0) {
+      candidate = segOut[0];
+    } else if (segOut && (segOut.mask || segOut.data)) {
+      candidate = segOut;
+    }
+    if (candidate && candidate.mask) mask = candidate.mask;
+    else if (candidate && candidate.data && candidate.width) mask = candidate;
+  } catch (e) {
+    console.error("MODNet error:", e);
+  }
+
+  // 3) Applique le masque comme alpha (ou fallback couleur)
+  const result = document.createElement("canvas");
+  result.width = z.w; result.height = z.h;
+  const rctx = result.getContext("2d");
+  rctx.drawImage(zoneCanvas, 0, 0);
+  const imgData = rctx.getImageData(0, 0, z.w, z.h);
+
+  if (mask && mask.data && mask.width && mask.height) {
+    // Masque IA : valeurs 0..255 → alpha
+    const md = mask.data; const mw = mask.width, mh = mask.height;
+    for (let y = 0; y < z.h; y++) {
+      for (let x = 0; x < z.w; x++) {
+        const mx = Math.min(mw - 1, Math.floor(x * mw / z.w));
+        const my = Math.min(mh - 1, Math.floor(y * mh / z.h));
+        const mVal = md[my * mw + mx];
+        imgData.data[(y * z.w + x) * 4 + 3] = mVal;
+      }
+    }
+    rctx.putImageData(imgData, 0, 0);
+    return new Promise((res) => result.toBlob((b) => res(b), "image/png"));
+  } else {
+    // Fallback : détourage par couleur de fond (coin haut-gauche)
+    console.warn("Pas de masque IA, fallback par couleur.");
+    toast("Détourage IA indisponible — fallback par couleur.", "error");
+    return cutByColor(zoneCanvas);
+  }
+}
+
+// Fallback : retire la couleur de fond (similaire au coin haut-gauche)
+function cutByColor(zoneCanvas) {
+  const w = zoneCanvas.width, h = zoneCanvas.height;
+  const ctx2 = zoneCanvas.getContext("2d");
+  const data = ctx2.getImageData(0, 0, w, h);
+  const px = data.data;
+  const bg = [px[0], px[1], px[2]];
+  const tol = 80;
+  for (let i = 0; i < px.length; i += 4) {
+    const d = Math.abs(px[i] - bg[0]) + Math.abs(px[i+1] - bg[1]) + Math.abs(px[i+2] - bg[2]);
+    if (d < tol * 3) px[i + 3] = 0;
+  }
+  const out = document.createElement("canvas");
+  out.width = w; out.height = h;
+  out.getContext("2d").putImageData(data, 0, 0);
+  return new Promise((res) => out.toBlob((b) => res(b), "image/png"));
+}
+
+// ---- Découpe simple (sans IA) : garde la zone telle quelle, sans retirer le fond
+async function cropZone(zone, name) {
+  if (!sourceImg) return null;
+  const scaleX = sourceImg.naturalWidth / canvas.width;
+  const scaleY = sourceImg.naturalHeight / canvas.height;
+  const z = {
+    x: Math.max(0, Math.floor(zone.x * scaleX)),
+    y: Math.max(0, Math.floor(zone.y * scaleY)),
+    w: Math.min(sourceImg.naturalWidth, Math.max(2, Math.ceil(zone.w * scaleX))),
+    h: Math.min(sourceImg.naturalHeight, Math.max(2, Math.ceil(zone.h * scaleY)))
+  };
+  if (z.x + z.w > sourceImg.naturalWidth) z.w = sourceImg.naturalWidth - z.x;
+  if (z.y + z.h > sourceImg.naturalHeight) z.h = sourceImg.naturalHeight - z.y;
+  if (z.w < 2 || z.h < 2) return null;
+  const out = document.createElement("canvas");
+  out.width = z.w; out.height = z.h;
+  out.getContext("2d").drawImage(sourceImg, z.x, z.y, z.w, z.h, 0, 0, z.w, z.h);
+  return new Promise((res) => out.toBlob((b) => res(b), "image/png"));
+}
+
+// ---- Bouton : détourer rectangle
+$("#btn-cut").addEventListener("click", async () => {
+  if (!rect || isProcessing) return;
+  isProcessing = true;
+  setButtonsBusy(true);
+  try {
+    const blob = await cutZone(rect, "logo");
+    if (blob) addExport(blob, "logo");
+  } catch (e) { console.error(e); toast("Erreur : " + e.message, "error"); }
+  isProcessing = false;
+  setButtonsBusy(false);
+  progressBox.classList.add("is-hidden");
+});
+
+// ---- Bouton : détourer toute la grille (batch)
+$("#btn-cut-all").addEventListener("click", async () => {
+  if (gridCells.length === 0 || isProcessing) return;
+  isProcessing = true;
+  setButtonsBusy(true);
+  progressBox.classList.remove("is-hidden");
+  let ok = 0;
+  for (let i = 0; i < gridCells.length; i++) {
+    setProgress((i / gridCells.length) * 100, "Détourage grille : " + (i + 1) + "/" + gridCells.length);
+    try {
+      const blob = await cutZone(gridCells[i], "logo-" + (i + 1));
+      if (blob) { addExport(blob, "logo-" + (i + 1)); ok++; }
+    } catch (e) {
+      console.error("Zone " + (i + 1) + ":", e);
+      toast("Zone " + (i + 1) + " échouée : " + e.message, "error");
+    }
+  }
+  setProgress(100, ok + " logo(s) découpés.");
+  isProcessing = false;
+  setButtonsBusy(false);
+  setTimeout(() => progressBox.classList.add("is-hidden"), 1500);
+});
+
+function setButtonsBusy(busy) {
+  ["btn-cut", "btn-cut-all", "btn-crop", "btn-crop-all", "btn-load"].forEach(id => {
+    const b = $("#" + id); if (b) b.disabled = busy;
+  });
+}
+
+// ---- Bouton : juste découper rectangle (sans IA)
+$("#btn-crop").addEventListener("click", async () => {
+  if (!rect || isProcessing) return;
+  isProcessing = true;
+  setButtonsBusy(true);
+  try {
+    const blob = await cropZone(rect, "logo");
+    if (blob) addExport(blob, "logo");
+  } catch (e) { console.error(e); toast("Erreur : " + e.message, "error"); }
+  isProcessing = false;
+  setButtonsBusy(false);
+});
+
+// ---- Bouton : juste découper toute la grille (sans IA)
+$("#btn-crop-all").addEventListener("click", async () => {
+  if (gridCells.length === 0 || isProcessing) return;
+  isProcessing = true;
+  setButtonsBusy(true);
+  progressBox.classList.remove("is-hidden");
+  let ok = 0;
+  for (let i = 0; i < gridCells.length; i++) {
+    setProgress((i / gridCells.length) * 100, "Découpe grille : " + (i + 1) + "/" + gridCells.length);
+    try {
+      const blob = await cropZone(gridCells[i], "logo-" + (i + 1));
+      if (blob) { addExport(blob, "logo-" + (i + 1)); ok++; }
+    } catch (e) {
+      console.error("Zone " + (i + 1) + ":", e);
+      toast("Zone " + (i + 1) + " échouée : " + e.message, "error");
+    }
+  }
+  setProgress(100, ok + " logo(s) découpés.");
+  isProcessing = false;
+  setButtonsBusy(false);
+  setTimeout(() => progressBox.classList.add("is-hidden"), 1500);
+});
+
+// ---- Gomme de fond (clic sur couleur similaire au bord)
+$("#btn-erase").addEventListener("click", async () => {
+  if (!sourceImg || !rect || mode !== "rect") {
+    toast("Sélectionnez d'abord un rectangle.", "error");
+    return;
+  }
+  // Échantillonne la couleur du coin haut-gauche de la zone
+  const data = ctx.getImageData(rect.x, rect.y, rect.w, rect.h).data;
+  const bg = [data[0], data[1], data[2]];
+  const tol = 60;
+  const z = { x: Math.floor(rect.x), y: Math.floor(rect.y), w: Math.ceil(rect.w), h: Math.ceil(rect.h) };
+  const out = document.createElement("canvas");
+  out.width = z.w; out.height = z.h;
+  const octx = out.getContext("2d");
+  const src = ctx.getImageData(z.x, z.y, z.w, z.h);
+  for (let i = 0; i < src.data.length; i += 4) {
+    const d = Math.abs(src.data[i] - bg[0]) + Math.abs(src.data[i+1] - bg[1]) + Math.abs(src.data[i+2] - bg[2]);
+    if (d < tol * 3) src.data[i + 3] = 0;
+  }
+  octx.putImageData(src, 0, 0);
+  out.toBlob((b) => { if (b) addExport(b, "logo-gomme"); }, "image/png");
+});
+
+// ---- Liste des exports
+function addExport(blob, baseName) {
+  const n = exports.length + 1;
+  const name = baseName + "-" + n + ".png";
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    exports.push({ name, blob, url, w: img.naturalWidth, h: img.naturalHeight });
+    renderExports();
+    toast("Export : " + name, "success");
+  };
+  img.src = url;
+}
+function renderExports() {
+  const list = $("#export-list");
+  list.innerHTML = "";
+  exports.forEach((e, i) => {
+    const item = document.createElement("div");
+    item.className = "export-item";
+    item.innerHTML = `
+      <img class="export-thumb" src="${e.url}" alt="${e.name}">
+      <div class="export-meta">
+        <div class="export-name">${e.name}</div>
+        <div class="export-info">${e.w}×${e.h}px · ${(e.blob.size / 1024).toFixed(0)} Ko</div>
+      </div>
+      <div class="export-actions-row">
+        <button title="Télécharger" data-act="dl" data-i="${i}">⬇</button>
+        <button title="Supprimer" data-act="del" data-i="${i}">×</button>
+      </div>`;
+    list.appendChild(item);
+  });
+  $("#exports-hint").textContent = exports.length ? exports.length + " export(s) prêt(s)." : "Aucun export pour l'instant.";
+  $("#bulk-actions").hidden = exports.length === 0;
+}
+$("#export-list").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-act]");
+  if (!btn) return;
+  const i = +btn.dataset.i;
+  if (btn.dataset.act === "dl") {
+    const a = document.createElement("a");
+    a.href = exports[i].url; a.download = exports[i].name;
+    document.body.appendChild(a); a.click(); a.remove();
+  } else if (btn.dataset.act === "del") {
+    URL.revokeObjectURL(exports[i].url);
+    exports.splice(i, 1);
+    renderExports();
+  }
+});
+
+// ---- Tout télécharger en zip
+$("#btn-download-all").addEventListener("click", async () => {
+  if (exports.length === 0) return;
+  toast("Création du zip…");
+  const zip = new JSZip();
+  exports.forEach((e) => zip.file(e.name, e.blob));
+  const blob = await zip.generateAsync({ type: "blob" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "logos-detoures.zip";
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast("Zip téléchargé.", "success");
+});
+
+// Init
+updateCutButtons();
+
+// Thème clair / sombre
+(function () {
+  const btn = document.getElementById("btn-theme");
+  const sync = () => {
+    const dark = document.documentElement.dataset.theme === "dark";
+    if (btn) {
+      btn.textContent = dark ? "☀️" : "🌙";
+      btn.setAttribute("aria-pressed", String(dark));
+      btn.title = dark ? "Passer en mode clair" : "Passer en mode sombre";
+    }
+  };
+  sync();
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem("signature-studio:theme:v1", next); } catch (e) {}
+      sync();
+    });
+  }
+})();
+</script>
+</body>
+</html>

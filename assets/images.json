@@ -105,46 +105,96 @@
       "description": "Images libres de droits (Wikimedia Commons, bannière).",
       "images": [
         {
-          "file": "assets/images/banks/mairies/The-Hotel-de-Ville-after-the-Commune-jpg-0.jpg",
-          "alt": "<div class=\"fn\">\nThe Hôtel de Ville after the Commune</div>",
+          "file": "assets/images/banks/mairies/meru-mairie-facade.jpg",
+          "alt": "Mairie de Méru — façade",
           "slot": "banner",
-          "license": "Public domain",
-          "source": "https://commons.wikimedia.org/wiki/File:The_H%C3%B6tel_de_Ville_after_the_Commune.jpg"
+          "license": "Source : Google Maps",
+          "source": "https://ville-meru.fr/"
         },
         {
-          "file": "assets/images/banks/mairies/Paris-Hotel-de-ville-C-Marville-1871-jpg-1.jpg",
-          "alt": "Paris Hôtel de ville C. Marville 1871",
+          "file": "assets/images/banks/mairies/meru-services-adresses-horaires.jpg",
+          "alt": "Adresses et horaires des services — Méru",
           "slot": "banner",
-          "license": "Public domain",
-          "source": "https://commons.wikimedia.org/wiki/File:Paris_H%C3%B4tel_de_ville_C._Marville_1871.jpg"
+          "license": "Source : ville-meru.fr",
+          "source": "https://ville-meru.fr/"
         },
         {
-          "file": "assets/images/banks/mairies/Hotel-Ville-Paris-burnt-Commune-1871-jpg-2.jpg",
-          "alt": "Hôtel Ville Paris burnt Commune 1871",
+          "file": "assets/images/banks/mairies/meru-square-mullot.jpg",
+          "alt": "Square Mullot — Méru",
           "slot": "banner",
-          "license": "Public domain",
-          "source": "https://commons.wikimedia.org/wiki/File:H%C3%B4tel_Ville_Paris_burnt_Commune_1871.jpg"
+          "license": "Source : ville-meru.fr",
+          "source": "https://ville-meru.fr/"
+        }
+      ]
+    },
+    {
+      "id": "icones",
+      "label": "Icônes",
+      "description": "Icônes SVG libres de droits pour signatures d'entreprise : fleurs, TV, informatique, web, contact, etc.",
+      "images": [
+        {
+          "file": "assets/images/icones/fleur-tournesol.svg",
+          "alt": "Fleur — Tournesol"
         },
         {
-          "file": "assets/images/banks/mairies/Paris-Hotel-de-Ville-2014-1714-jpg-3.jpg",
-          "alt": "Paris, Hôtel de Ville -- 2014 -- 1714",
-          "slot": "banner",
-          "license": "CC BY-SA 4.0",
-          "source": "https://commons.wikimedia.org/wiki/File:Paris,_H%C3%B4tel_de_Ville_--_2014_--_1714.jpg"
+          "file": "assets/images/icones/fleur-tulipe.svg",
+          "alt": "Fleur — Tulipe"
         },
         {
-          "file": "assets/images/banks/mairies/Hotel-de-ville-Oberhergheim-jpg-4.jpg",
-          "alt": "Hôtel de ville (Oberhergheim)",
-          "slot": "banner",
-          "license": "CC BY-SA 4.0",
-          "source": "https://commons.wikimedia.org/wiki/File:H%C3%B4tel_de_ville_(Oberhergheim).jpg"
+          "file": "assets/images/icones/fleur-marguerite.svg",
+          "alt": "Fleur — Marguerite"
         },
         {
-          "file": "assets/images/banks/mairies/Paris-Hotel-de-Ville-Putti-1-jpg-5.jpg",
-          "alt": "Paris Hôtel de Ville Putti (1)",
-          "slot": "banner",
-          "license": "CC BY-SA 4.0",
-          "source": "https://commons.wikimedia.org/wiki/File:Paris_H%C3%B4tel_de_Ville_Putti_(1).jpg"
+          "file": "assets/images/icones/television.svg",
+          "alt": "Télévision"
+        },
+        {
+          "file": "assets/images/icones/ordinateur.svg",
+          "alt": "Ordinateur"
+        },
+        {
+          "file": "assets/images/icones/clavier.svg",
+          "alt": "Clavier"
+        },
+        {
+          "file": "assets/images/icones/cd-rom.svg",
+          "alt": "CD-ROM / Disque"
+        },
+        {
+          "file": "assets/images/icones/graphique.svg",
+          "alt": "Graphique / Statistiques"
+        },
+        {
+          "file": "assets/images/icones/web.svg",
+          "alt": "Web / Internet"
+        },
+        {
+          "file": "assets/images/icones/mailing.svg",
+          "alt": "Mailing / Enveloppe"
+        },
+        {
+          "file": "assets/images/icones/dossier.svg",
+          "alt": "Dossier"
+        },
+        {
+          "file": "assets/images/icones/securite.svg",
+          "alt": "Sécurité / Bouclier"
+        },
+        {
+          "file": "assets/images/icones/contact.svg",
+          "alt": "Contact / Carte de visite"
+        },
+        {
+          "file": "assets/images/icones/geo localisation.svg",
+          "alt": "Géolocalisation / Adresse"
+        },
+        {
+          "file": "assets/images/icones/document.svg",
+          "alt": "Document"
+        },
+        {
+          "file": "assets/images/icones/telephone.svg",
+          "alt": "Téléphone"
         }
       ]
     },
@@ -383,55 +433,6 @@
           "slot": "banner",
           "license": "CC BY 4.0",
           "source": "https://commons.wikimedia.org/wiki/File:Liquid_circuit_cooling_installation_for_a_Static_VAR_Compensator_used_in_a_large_high_voltage_electrical_distribution_network.jpg"
-        }
-      ]
-    },
-    {
-      "id": "transports",
-      "label": "Transports",
-      "description": "Images libres de droits (Wikimedia Commons, bannière).",
-      "images": [
-        {
-          "file": "assets/images/banks/transports/Locomotive-EPL2T-on-train-station-in-Donetsk-jpg-0.jpg",
-          "alt": "Locomotive EPL2T on train station in Donetsk",
-          "slot": "banner",
-          "license": "CC BY-SA 3.0",
-          "source": "https://commons.wikimedia.org/wiki/File:Locomotive_EPL2T_on_train_station_in_Donetsk.jpg"
-        },
-        {
-          "file": "assets/images/banks/transports/140th-anniversary-of-public-transport-in-Szczecin--1.jpg",
-          "alt": "140th anniversary of public transport in Szczecin, Police train station (3)",
-          "slot": "banner",
-          "license": "CC BY-SA 4.0",
-          "source": "https://commons.wikimedia.org/wiki/File:140th_anniversary_of_public_transport_in_Szczecin,_Police_train_station_(3).jpg"
-        },
-        {
-          "file": "assets/images/banks/transports/140th-anniversary-of-public-transport-in-Szczecin--2.jpg",
-          "alt": "140th anniversary of public transport in Szczecin, Police train station (2)",
-          "slot": "banner",
-          "license": "CC BY-SA 4.0",
-          "source": "https://commons.wikimedia.org/wiki/File:140th_anniversary_of_public_transport_in_Szczecin,_Police_train_station_(2).jpg"
-        },
-        {
-          "file": "assets/images/banks/transports/140th-anniversary-of-public-transport-in-Szczecin--3.jpg",
-          "alt": "140th anniversary of public transport in Szczecin, Police train station",
-          "slot": "banner",
-          "license": "CC BY-SA 4.0",
-          "source": "https://commons.wikimedia.org/wiki/File:140th_anniversary_of_public_transport_in_Szczecin,_Police_train_station.jpg"
-        },
-        {
-          "file": "assets/images/banks/transports/140th-anniversary-of-public-transport-in-Szczecin--4.jpg",
-          "alt": "140th anniversary of public transport in Szczecin, Police train station (4)",
-          "slot": "banner",
-          "license": "CC BY-SA 4.0",
-          "source": "https://commons.wikimedia.org/wiki/File:140th_anniversary_of_public_transport_in_Szczecin,_Police_train_station_(4).jpg"
-        },
-        {
-          "file": "assets/images/banks/transports/CRT-jpg-5.jpg",
-          "alt": "CRT鲤鱼池 站台间换乘通道",
-          "slot": "banner",
-          "license": "CC BY-SA 4.0",
-          "source": "https://commons.wikimedia.org/wiki/File:CRT%E9%B2%A4%E9%B1%BC%E6%B1%A0_%E7%AB%99%E5%8F%B0%E9%97%B4%E6%8D%A2%E4%B9%98%E9%80%9A%E9%81%93.jpg"
         }
       ]
     },

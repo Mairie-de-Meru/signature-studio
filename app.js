@@ -2,6 +2,8 @@
 
 const STORAGE_KEY = "signature-studio:state:v2";
 const IMPORTS_KEY = "signature-studio:imports:v1";
+const THEME_KEY = "signature-studio:theme:v1";
+const ACC_KEY = "signature-studio:acc:v1";
 
 const BASE_URL = window.location.origin +
   (window.location.pathname.replace(/\/[^/]*$/, '/') || '/');
@@ -132,6 +134,50 @@ function updateState(mutator) {
   renderAll();
 }
 
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t;
+  try { localStorage.setItem(THEME_KEY, t); } catch {}
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = t === "dark" ? "#11151c" : "#2358c7";
+  const btn = $("#btn-theme");
+  if (btn) {
+    btn.textContent = t === "dark" ? "☀️" : "🌙";
+    btn.setAttribute("aria-pressed", String(t === "dark"));
+    btn.title = t === "dark" ? "Passer en mode clair" : "Passer en mode sombre";
+  }
+}
+
+let accordionState = {};
+function loadAccordionState() {
+  try { accordionState = JSON.parse(sessionStorage.getItem(ACC_KEY)) || {}; }
+  catch { accordionState = {}; }
+}
+function saveAccordionState() {
+  try { sessionStorage.setItem(ACC_KEY, JSON.stringify(accordionState)); }
+  catch {}
+}
+function setSectionOpen(fs, open) {
+  fs.classList.toggle("is-collapsed", !open);
+  const btn = fs.querySelector(".accordion-toggle");
+  if (btn) btn.setAttribute("aria-expanded", String(open));
+  accordionState[fs.id] = open;
+  saveAccordionState();
+}
+function bindAccordions() {
+  $$("#signature-form fieldset").forEach((fs) => {
+    const btn = fs.querySelector(".accordion-toggle");
+    if (!btn) return;
+    const known = accordionState[fs.id] !== undefined;
+    setSectionOpen(fs, known ? accordionState[fs.id] : fs.id === "fs-identite");
+    btn.addEventListener("click", () => setSectionOpen(fs, fs.classList.contains("is-collapsed")));
+  });
+}
+function openSectionOf(el) {
+  const fs = el && el.closest ? el.closest("fieldset") : null;
+  if (!fs || !fs.querySelector(".accordion-toggle")) return;
+  setSectionOpen(fs, true);
+}
+
 function buildParts(st, exportMode) {
   const d = st.data, s = st.style, v = st.show;
   const at = (k) => (exportMode ? "" : ` data-edit="${k}"`);
@@ -245,11 +291,11 @@ ${p.legal ? `<tr><td style="padding-top:${pad + 4}px;text-align:${s.align};">${p
     render(p) {
       const { s } = p, pad = Math.max(2, s.spacing - 2);
       const sep = `<span style="${p.base}color:${s.secondary};">&nbsp;|&nbsp;</span>`;
-      const line1 = [p.name, [p.role, p.company].filter(Boolean).join(`<span style="${p.base}">, </span>`)]
-        .filter(Boolean).join(`<span style="${p.base}color:${s.secondary};"> — </span>`);
+      const roleLine = [p.role, p.company].filter(Boolean).join(`<span style="${p.base}">, </span>`);
       return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
 <tr><td style="text-align:${s.align};">
-<div>${line1}</div>
+<div>${p.name}</div>
+${roleLine ? `<div style="padding-top:1px;">${roleLine}</div>` : ""}
 ${p.contactList.length ? `<div style="padding-top:${pad}px;">${p.contactList.join(sep)}</div>` : ""}
 ${p.social ? `<div style="padding-top:${pad}px;">${p.social}</div>` : ""}
 ${p.legal ? `<div style="padding-top:${pad + 2}px;">${p.legal}</div>` : ""}
@@ -340,17 +386,29 @@ function renderTemplateList() {
     const mini = { ...state, template: id, show: { ...state.show }, data: { ...state.data }, style: { ...state.style } };
     card.innerHTML =
       `<div class="tpl-thumb" aria-hidden="true"><div class="tpl-thumb-inner">${buildSignatureHtml(mini)}</div></div>` +
-      `<span class="tpl-name">${tpl.label}</span>`;
+      `<span class="tpl-name-row"><span class="tpl-name">${tpl.label}</span>` +
+      (selected ? `<span class="tpl-badge">En cours</span>` : "") +
+      `</span>`;
     card.addEventListener("click", () => updateState((s) => { s.template = id; }));
     list.appendChild(card);
   }
 }
 
 function renderImageSlots() {
-  const setImg = (id, val) => { const el = $(id); if (el) el.src = val || ""; };
-  setImg("#slot-photo", getAvatarSrc(false));
-  setImg("#slot-logo", state.data.logo);
-  setImg("#slot-banner", getBannerSrc(false));
+  const slots = [
+    { img: "#slot-photo",  empty: "#slot-photo-empty",  val: getAvatarSrc(false) },
+    { img: "#slot-logo",   empty: "#slot-logo-empty",   val: state.data.logo },
+    { img: "#slot-banner", empty: "#slot-banner-empty", val: getBannerSrc(false) }
+  ];
+  for (const s of slots) {
+    const imgEl = $(s.img);
+    if (!imgEl) continue;
+    const has = !!s.val;
+    imgEl.src = s.val || "";
+    imgEl.style.display = has ? "" : "none";
+    const emp = $(s.empty);
+    if (emp) emp.hidden = has;
+  }
 }
 
 function getBannerSrc(exportMode) {
@@ -539,7 +597,11 @@ function renderWarnings() {
   for (const w of warnings) {
     if (w.level === "error" && w.field) {
       const inp = document.querySelector(`[data-field="${w.field}"]`);
-      if (inp) { inp.classList.add("is-invalid"); inp.setAttribute("aria-invalid", "true"); }
+      if (inp) {
+        inp.classList.add("is-invalid");
+        inp.setAttribute("aria-invalid", "true");
+        openSectionOf(inp);
+      }
     }
   }
 }
@@ -649,10 +711,13 @@ function renderBankTabs() {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "bank-tab" + (cat.id === currentCategory ? " is-active" : "");
-    b.textContent = cat.label;
     b.title = cat.description || "";
+    const count = cat.images.length;
+    b.innerHTML = esc(cat.label) + (count ? `<span class="bank-count">${count}</span>` : "");
     b.addEventListener("click", () => {
       currentCategory = cat.id;
+      const sr = $("#bank-search");
+      if (sr) sr.value = "";
       renderBankTabs();
       renderBankGrid();
     });
@@ -664,11 +729,26 @@ function renderBankGrid() {
   const grid = $("#bank-grid");
   grid.innerHTML = "";
   const cat = getBankCategories().find((c) => c.id === currentCategory);
-  if (!cat || !cat.images.length) {
-    grid.innerHTML = `<p class="bank-empty">Aucune image dans cette catégorie.</p>`;
+  if (!cat) return;
+  const search = $("#bank-search");
+  const query = ((search && search.value) || "").trim().toLowerCase();
+  const images = query
+    ? cat.images.filter((im) =>
+        ((im.alt || "") + " " + (im.name || "") + " " + (im.file || "")).toLowerCase().includes(query))
+    : cat.images;
+  if (!images.length) {
+    grid.innerHTML = query
+      ? `<div class="bank-empty-state"><span class="bank-empty-icon" aria-hidden="true">🔍</span>` +
+        `<p><strong>Aucun résultat</strong> pour « ${esc(query)} ».</p>` +
+        `<p>Essayez un autre mot-clé, ou changez de catégorie.</p></div>`
+      : `<div class="bank-empty-state"><span class="bank-empty-icon" aria-hidden="true">🖼️</span>` +
+        `<p><strong>Aucune image</strong> dans cette catégorie.</p>` +
+        `<button type="button" class="btn btn-secondary btn-sm" id="btn-empty-import">+ Importer une image</button></div>`;
+    const bi = $("#btn-empty-import");
+    if (bi) bi.addEventListener("click", () => { const f = $("#import-file"); if (f) f.click(); });
     return;
   }
-  for (const img of cat.images) {
+  for (const img of images) {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "bank-item";
@@ -706,17 +786,23 @@ function applyBankImageDirect(catId, img, btn) {
   showToast(`Image appliquée comme ${labels[slot]}.`, "success");
 }
 
+let zoomLastFocus = null;
+
 function openZoom(src, alt) {
   const layer = $("#zoom-layer");
   const im = $("#zoom-img");
   im.src = src;
   im.alt = alt || "";
   layer.classList.remove("is-hidden");
+  zoomLastFocus = document.activeElement;
+  $("#zoom-close").focus();
 }
 
 function closeZoom() {
   $("#zoom-layer").classList.add("is-hidden");
   $("#zoom-img").src = "";
+  if (zoomLastFocus && document.body.contains(zoomLastFocus)) zoomLastFocus.focus();
+  zoomLastFocus = null;
 }
 
 function handleImportFile(file) {
@@ -795,17 +881,86 @@ async function copyHtmlCode() {
   }
 }
 
-function downloadHtml() {
-  const blob = new Blob([buildEmailDocument(state)], { type: "text/html;charset=utf-8" });
+function downloadBlob(blob, filename, msg) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "signature.html";
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-  showToast("Fichier signature.html téléchargé.", "success");
+  if (msg) showToast(msg, "success");
+}
+
+function downloadHtml() {
+  downloadBlob(new Blob([buildEmailDocument(state)], { type: "text/html;charset=utf-8" }),
+    "signature.html", "Fichier signature.html téléchargé.");
+}
+
+function downloadPng() {
+  const node = $("#preview-signature");
+  if (!node || !node.firstChild) { showToast("Aucune signature à exporter.", "error"); return; }
+  const prev = node.style.background;
+  node.style.background = "#ffffff";
+  const data = new XMLSerializer().serializeToString(node);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${node.scrollWidth}" height="${node.scrollHeight}">
+    <foreignObject x="0" y="0" width="100%" height="100%">
+      <div xmlns="http://www.w3.org/1999/xhtml" style="padding:16px;background:#ffffff;">${data}</div>
+    </foreignObject></svg>`;
+  node.style.background = prev;
+  const img = new Image();
+  img.onload = () => {
+    const scale = 2;
+    const canvas = document.createElement("canvas");
+    canvas.width = node.scrollWidth * scale;
+    canvas.height = node.scrollHeight * scale;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(scale, scale);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, node.scrollWidth, node.scrollHeight);
+    ctx.drawImage(img, 0, 0);
+    canvas.toBlob((blob) => {
+      if (!blob) { showToast("Export PNG impossible (images externes bloquées par CORS).", "error"); return; }
+      downloadBlob(blob, "signature.png", "Image signature.png téléchargée.");
+    }, "image/png");
+  };
+  img.onerror = () => showToast("Export PNG impossible (image externe bloquée par CORS).", "error");
+  img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+
+function downloadEml() {
+  const htmlBody = buildEmailDocument(state);
+  const d = state.data;
+  const fromName = esc([d.firstName, d.lastName].filter(Boolean).join(" ")) || "Signature";
+  const fromEmail = d.email || "signature@example.com";
+  const subject = "Signature — " + fromName;
+  const boundary = "----=_SignatureStudio_" + Math.random().toString(36).slice(2);
+  const headers = [
+    "MIME-Version: 1.0",
+    `From: ${fromName} <${fromEmail}>`,
+    `To: ${fromEmail}`,
+    `Subject: ${subject}`,
+    `Date: ${new Date().toUTCString()}`,
+    "X-Unsent: 1",
+    "Content-Type: multipart/alternative; boundary=\"" + boundary + "\"",
+    "", ""
+  ].join("\r\n");
+  const textBody = buildPlainText(state);
+  const body = [
+    "--" + boundary,
+    "Content-Type: text/plain; charset=utf-8",
+    "Content-Transfer-Encoding: 8bit",
+    "", textBody, "",
+    "--" + boundary,
+    "Content-Type: text/html; charset=utf-8",
+    "Content-Transfer-Encoding: 8bit",
+    "", htmlBody, "",
+    "--" + boundary + "--",
+    ""
+  ].join("\r\n");
+  downloadBlob(new Blob([headers + body], { type: "message/rfc822;charset=utf-8" }),
+    "signature.eml", "Brouillon signature.eml téléchargé. Ouvrez-le dans Mail / Outlook.");
 }
 
 function bindEvents() {
@@ -852,9 +1007,63 @@ function bindEvents() {
     e.target.value = "";
   });
 
+  const btnTheme = $("#btn-theme");
+  if (btnTheme) {
+    btnTheme.addEventListener("click", () => {
+      applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+    });
+  }
+
+  const search = $("#bank-search");
+  if (search) search.addEventListener("input", renderBankGrid);
+
+  $$(".slot-placeholder").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const catId = btn.dataset.bank;
+      if (catId && getBankCategories().some((c) => c.id === catId)) {
+        currentCategory = catId;
+        renderBankTabs();
+      }
+      const sr = $("#bank-search");
+      if (sr) sr.value = "";
+      renderBankGrid();
+    });
+  });
+
+  const btnMenu = $("#btn-header-menu");
+  const listMenu = $("#header-menu-list");
+  if (btnMenu && listMenu) {
+    btnMenu.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const closed = listMenu.classList.toggle("is-hidden");
+      btnMenu.setAttribute("aria-expanded", String(!closed));
+    });
+    document.addEventListener("click", () => {
+      if (!listMenu.classList.contains("is-hidden")) {
+        listMenu.classList.add("is-hidden");
+        btnMenu.setAttribute("aria-expanded", "false");
+      }
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !listMenu.classList.contains("is-hidden")) {
+        listMenu.classList.add("is-hidden");
+        btnMenu.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
   $("#zoom-close").addEventListener("click", closeZoom);
   $("#zoom-layer").addEventListener("click", (e) => { if (e.target.id === "zoom-layer") closeZoom(); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeZoom(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeZoom();
+    if (e.key === "Tab") {
+      const layer = $("#zoom-layer");
+      if (layer && !layer.classList.contains("is-hidden")) {
+        const focusables = layer.querySelectorAll("button, [href], [tabindex]:not([tabindex='-1'])");
+        if (focusables.length) { e.preventDefault(); focusables[0].focus(); }
+      }
+    }
+  });
 
   $("#btn-copy").addEventListener("click", copySignature);
   $("#btn-select").addEventListener("click", () => {
@@ -862,7 +1071,32 @@ function bindEvents() {
     showToast("Signature sélectionnée. Copiez avec Ctrl+C / Cmd+C.", "success");
   });
   $("#btn-copy-html").addEventListener("click", copyHtmlCode);
-  $("#btn-download").addEventListener("click", downloadHtml);
+
+  const btnDl = $("#btn-download");
+  const listDl = $("#download-list");
+  if (btnDl && listDl) {
+    btnDl.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const open = listDl.classList.toggle("is-hidden");
+      btnDl.setAttribute("aria-expanded", String(!open));
+    });
+    document.addEventListener("click", () => {
+      if (!listDl.classList.contains("is-hidden")) {
+        listDl.classList.add("is-hidden");
+        btnDl.setAttribute("aria-expanded", "false");
+      }
+    });
+    listDl.addEventListener("click", (e) => {
+      const item = e.target.closest("[data-dl]");
+      if (!item) return;
+      const kind = item.getAttribute("data-dl");
+      listDl.classList.add("is-hidden");
+      btnDl.setAttribute("aria-expanded", "false");
+      if (kind === "html") downloadHtml();
+      else if (kind === "png") downloadPng();
+      else if (kind === "eml") downloadEml();
+    });
+  }
 
   $("#btn-reset-style").addEventListener("click", () => {
     updateState((s) => { s.style = structuredClone(DEFAULT_STATE.style); });
@@ -886,8 +1120,11 @@ function bindEvents() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+  loadAccordionState();
   syncFormFromState();
   bindEvents();
+  bindAccordions();
   renderAll();
   loadImageBank();
 });
