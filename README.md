@@ -24,6 +24,12 @@ signature-studio/
 ├── index.html          Structure de la page (3 zones)
 ├── styles.css          Styles de l'interface
 ├── app.js              Logique : état, modèles, aperçu, export
+├── index-single.html   Fichier autonome (CSS+JS+images inliné) — pour ouverture locale/AionUi
+├── detourage.html      Outil de détourage d'image
+├── scripts/            Outils Node (non requis à l'exécution)
+│   ├── build-single.mjs   Génère index-single.html
+│   ├── fetch-bank.mjs     Importe des banques libres depuis Wikimedia Commons
+│   └── fetch-avatars.mjs  Génère des avatars illustrés (DiceBear)
 ├── README.md
 └── assets/
     ├── images.json     Banque d'images (source principale)
@@ -33,8 +39,40 @@ signature-studio/
         ├── avatars/    Avatars génériques
         ├── logos/      Logos de démonstration
         ├── bannieres/  Bannières génériques
-        └── social/     Icônes sociales de référence
+        ├── social/     Icônes sociales de référence
+        └── banks/      Banques libres récupérées (mairies, nature, fonds, avatars…)
 ```
+
+## ✨ Fonctionnalités
+
+- **Banque d'images libres** : avatars, logos, bannières, fonds, nature, etc.
+  (Wikipédia Commons + DiceBear), hébergées localement.
+- **Application directe au clic** : une image de la banque est placée
+  automatiquement (photo / logo / bannière) sans choisir l'emplacement.
+- **Coloriser un avatar** : sélectionnez un avatar illustré et changez sa
+  couleur avec le sélecteur (s'applique aux avatars monochromes).
+- **Texte sur la bannière** : incrustez un titre + sous-titre dans la bannière
+  (couleur, taille, position, alignement).
+- **Code QR** : insérez un code QR pointant vers votre site (ou une URL libre).
+- **Mentions légales prêtes à l'emploi** : Environnement, RGPD, Institutionnel.
+- **Sauvegarde / Restauration** : exportez votre configuration en JSON et
+  restaurez-la plus tard (`💾 Sauvegarder` / `📂 Restaurer`).
+- **Aperçu agrandi (lightbox)** : cliquez sur une image de la signature pour
+  la voir en grand.
+- **Détection** : avertissements (champs vides, URLs invalides, images
+  data-URI pouvant être bloquées par Gmail).
+
+## 🗂️ Régénérer la banque d'images (optionnel)
+
+L'application fonctionne sans Node.js. Les scripts servent uniquement à
+enrichir la banque :
+
+```bash
+node scripts/fetch-bank.mjs      # banques Wikimedia Commons
+node scripts/fetch-avatars.mjs   # avatars illustrés (DiceBear)
+node scripts/build-single.mjs    # régénère index-single.html
+```
+
 
 ## ➕ Ajouter un modèle de signature
 

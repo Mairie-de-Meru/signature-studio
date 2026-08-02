@@ -6,7 +6,7 @@
   <title>Signature Studio — Créateur de signatures e-mail</title>
   <meta name="description" content="Concevez et exportez des signatures e-mail professionnelles. Application 100% statique, sans serveur ni installation.">
   <meta name="theme-color" content="#2358c7">
-  <link rel="stylesheet" href="styles.css?v=20260731-2">
+  <link rel="stylesheet" href="styles.css?v=20260802-1">
 </head>
 <body>
 
@@ -210,8 +210,28 @@
             <input type="checkbox" class="switch" data-show="legal" checked aria-label="Afficher la mention" title="Afficher / masquer">
           </legend>
           <div class="field-row">
+            <label for="s-legalPreset">Modèle</label>
+            <select id="s-legalPreset">
+              <option value="custom">Personnalisé</option>
+              <option value="env">Environnement</option>
+              <option value="rgpd">RGPD</option>
+              <option value="institut">Institutionnel</option>
+            </select>
+          </div>
+          <div class="field-row">
             <textarea id="f-legal" data-field="legal" rows="2" aria-label="Texte légal ou environnemental"
               placeholder="Ex. : Pensez à l'environnement avant d'imprimer ce message."></textarea>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Code QR
+            <input type="checkbox" class="switch" data-show="qr" aria-label="Afficher un code QR" title="Afficher / masquer le code QR">
+          </legend>
+          <p class="hint">Insère un code QR pointant vers votre site web (ou l'URL ci-dessous).</p>
+          <div class="field-row">
+            <label for="f-qr">URL (option)</label>
+            <input type="url" id="f-qr" data-field="qr" placeholder="Laissez vide pour utiliser le site web">
           </div>
         </fieldset>
 
@@ -333,6 +353,15 @@
                   title="Télécharge un fichier signature.html autonome.">
             Télécharger
           </button>
+          <button type="button" id="btn-save" class="btn btn-secondary"
+                  title="Télécharge votre configuration (signature-config.json) pour la réutiliser plus tard.">
+            💾 Sauvegarder
+          </button>
+          <button type="button" id="btn-restore" class="btn btn-secondary"
+                  title="Restaurer une configuration précédemment sauvegardée.">
+            📂 Restaurer
+          </button>
+          <input type="file" id="restore-file" accept="application/json,.json" hidden>
         </div>
         <p class="hint-info">
           Les images sont automatiquement converties en URLs absolues hébergées sur ce site :
@@ -350,7 +379,7 @@
     <img id="zoom-img" src="" alt="">
   </div>
 
-  <script src="assets/images-data.js?v=20260731-2"></script>
-  <script src="app.js?v=20260731-2"></script>
+  <script src="assets/images-data.js?v=20260802-1"></script>
+  <script src="app.js?v=20260802-1"></script>
 </body>
 </html>

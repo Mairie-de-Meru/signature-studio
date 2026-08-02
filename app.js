@@ -34,12 +34,14 @@ const DEFAULT_STATE = {
     facebook: "",
     x: "",
     youtube: "",
-    legal: "🌱 Pensez à l'environnement : n'imprimez ce message que si nécessaire."
+    legal: "🌱 Pensez à l'environnement : n'imprimez ce message que si nécessaire.",
+    qr: ""
   },
   show: {
     photo: true, logo: true, banner: true,
     role: true, company: true, phone: true, email: true,
-    website: true, address: true, social: true, legal: true
+    website: true, address: true, social: true, legal: true,
+    qr: false
   },
   style: {
     font: "Arial, Helvetica, sans-serif",
@@ -58,6 +60,12 @@ const SOCIAL_NETWORKS = [
   { key: "x",         label: "X",         short: "X",  color: "#111111" },
   { key: "youtube",   label: "YouTube",   short: "YT", color: "#FF0000" }
 ];
+
+const LEGAL_PRESETS = {
+  env: "🌱 Pensez à l'environnement : n'imprimez ce message que si nécessaire.",
+  rgpd: "Conformément au RGPD, vos données personnelles sont traitées avec confidentialité. Pour vous désabonner, répondez à ce message.",
+  institut: "Mairie — Ce message et ses pièces jointes sont strictement confidentiels et destinés au seul destinataire."
+};
 
 function esc(str) {
   return String(str || "")
@@ -196,6 +204,11 @@ function buildParts(st, exportMode) {
     ? `<span${at("legal")} style="font-family:${s.font};font-size:${Math.max(10, s.fontSize - 3)}px;color:#8a949e;">${esc(d.legal)}</span>`
     : "";
 
+  const qrTarget = d.qr ? absUrl(d.qr) : (d.website ? absUrl(d.website) : "");
+  parts.qr = (v.qr && qrTarget)
+    ? `<div style="padding-top:${s.spacing}px;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(qrTarget)}" width="110" height="110" style="display:block;width:110px;height:110px;" alt="Code QR"${at("qr")}></div>`
+    : "";
+
   return parts;
 }
 
@@ -213,6 +226,7 @@ ${p.role ? `<div style="padding-top:1px;">${p.role}</div>` : ""}
 ${p.company ? `<div style="padding-top:1px;">${p.company}</div>` : ""}
 ${p.contactBlock ? `<div style="padding-top:${pad}px;">${p.contactBlock}</div>` : ""}
 ${p.social ? `<div style="padding-top:${pad}px;">${p.social}</div>` : ""}
+${p.qr}
 ${p.logo ? `<div style="padding-top:${pad}px;">${p.logo}</div>` : ""}
 </td></tr>
 ${p.legal ? `<tr><td colspan="2" style="padding-top:${pad + 4}px;text-align:${s.align};">${p.legal}</td></tr>` : ""}
@@ -236,6 +250,7 @@ ${p.logo ? `<td valign="middle" style="padding-left:${pad + 14}px;">${p.logo}</t
 <tr><td style="padding-top:${pad}px;"><table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;"><tr><td style="border-top:2px solid ${s.primary};font-size:0;line-height:0;">&nbsp;</td></tr></table></td></tr>
 ${p.contactInline ? `<tr><td style="padding-top:${pad}px;text-align:${s.align};">${p.contactInline}</td></tr>` : ""}
 ${p.social ? `<tr><td style="padding-top:${pad}px;">${p.social}</td></tr>` : ""}
+${p.qr ? `<tr><td>${p.qr}</td></tr>` : ""}
 ${p.legal ? `<tr><td style="padding-top:${pad + 4}px;text-align:${s.align};">${p.legal}</td></tr>` : ""}
 </table>`;
     }
@@ -252,6 +267,7 @@ ${p.legal ? `<tr><td style="padding-top:${pad + 4}px;text-align:${s.align};">${p
 <div>${line1}</div>
 ${p.contactList.length ? `<div style="padding-top:${pad}px;">${p.contactList.join(sep)}</div>` : ""}
 ${p.social ? `<div style="padding-top:${pad}px;">${p.social}</div>` : ""}
+${p.qr}
 ${p.legal ? `<div style="padding-top:${pad + 2}px;">${p.legal}</div>` : ""}
 </td></tr></table>`;
     }
@@ -271,6 +287,7 @@ ${p.role ? `<div style="padding-top:1px;">${p.role}</div>` : ""}
 ${p.company ? `<div style="padding-top:1px;">${p.company}</div>` : ""}
 ${p.contactBlock ? `<div style="padding-top:${pad}px;">${p.contactBlock}</div>` : ""}
 ${p.social ? `<div style="padding-top:${pad}px;">${p.social}</div>` : ""}
+${p.qr}
 </td></tr></table></td></tr>
 ${p.banner ? `<tr><td style="padding-top:${pad + 4}px;">${p.banner}</td></tr>` : ""}
 ${p.legal ? `<tr><td style="padding-top:${pad + 2}px;text-align:${s.align};">${p.legal}</td></tr>` : ""}
@@ -525,6 +542,16 @@ function renderWarnings() {
   if (v.company && !d.company) missing.push("entreprise");
   if (missing.length) {
     warnings.push({ text: "Champs affichés mais vides : " + missing.join(", ") + ".", level: "info" });
+  }
+
+  const bankPhoto = findBankImage(state.data.photo);
+  const usesDataUri = (state.data.bannerTitle?.trim() || state.data.bannerSubtitle?.trim())
+    || (bankPhoto && bankPhoto.tintable);
+  if (usesDataUri) {
+    warnings.push({
+      text: "Bannière à texte ou avatar colorisé : ces images sont au format data-URI et peuvent ne pas s'afficher dans Gmail. Vérifiez auprès de vos destinataires.",
+      level: "info"
+    });
   }
 
   const box = $("#warnings");
@@ -808,6 +835,38 @@ function downloadHtml() {
   showToast("Fichier signature.html téléchargé.", "success");
 }
 
+function saveConfig() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "signature-config.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast("Configuration sauvegardée.", "success");
+}
+
+function restoreConfig(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      if (!parsed || typeof parsed !== "object") throw new Error("format");
+      state = mergeDefaults(parsed, DEFAULT_STATE);
+      saveState();
+      syncFormFromState();
+      renderAll();
+      showToast("Configuration restaurée.", "success");
+    } catch {
+      showToast("Fichier invalide.", "error");
+    }
+  };
+  reader.readAsText(file);
+}
+
 function bindEvents() {
   $$("[data-field]").forEach((el) => {
     el.addEventListener("input", () => {
@@ -863,6 +922,23 @@ function bindEvents() {
   });
   $("#btn-copy-html").addEventListener("click", copyHtmlCode);
   $("#btn-download").addEventListener("click", downloadHtml);
+
+  $("#btn-save").addEventListener("click", saveConfig);
+  $("#btn-restore").addEventListener("click", () => { $("#restore-file").click(); });
+  $("#restore-file").addEventListener("change", (e) => {
+    restoreConfig(e.target.files[0]);
+    e.target.value = "";
+  });
+
+  $("#s-legalPreset").addEventListener("change", (e) => {
+    const preset = LEGAL_PRESETS[e.target.value];
+    if (preset) {
+      updateState((s) => { s.data.legal = preset; });
+      syncFormFromState();
+      e.target.value = "custom";
+      showToast("Mention appliquée. Vous pouvez la modifier.", "success");
+    }
+  });
 
   $("#btn-reset-style").addEventListener("click", () => {
     updateState((s) => { s.style = structuredClone(DEFAULT_STATE.style); });
