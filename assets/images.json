@@ -532,6 +532,161 @@
           "source": "DiceBear (libre de droits)"
         }
       ]
+    },
+    {
+      "id": "generes-icones",
+      "label": "Icônes générées",
+      "description": "Icônes vectorielles générées par RunningHub (GPT Image 2), découpées en PNG transparents.",
+      "images": [
+        {
+          "file": "assets/images/banks/generes/icones/icone-telephone.png",
+          "alt": "Icône téléphone"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-enveloppe.png",
+          "alt": "Icône enveloppe"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-globe.png",
+          "alt": "Icône globe"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-position.png",
+          "alt": "Icône position"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-calendrier.png",
+          "alt": "Icône calendrier"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-horloge.png",
+          "alt": "Icône horloge"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-dossier.png",
+          "alt": "Icône dossier"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-document.png",
+          "alt": "Icône document"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-bouclier.png",
+          "alt": "Icône bouclier"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-graphique.png",
+          "alt": "Icône graphique"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-chat.png",
+          "alt": "Icône chat"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-profil.png",
+          "alt": "Icône profil"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-camera.png",
+          "alt": "Icône caméra"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-imprimante.png",
+          "alt": "Icône imprimante"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-panier.png",
+          "alt": "Icône panier"
+        },
+        {
+          "file": "assets/images/banks/generes/icones/icone-wifi.png",
+          "alt": "Icône wifi"
+        }
+      ]
+    },
+    {
+      "id": "generes-bannieres",
+      "label": "Bannières générées",
+      "description": "Illustrations génériques générées par RunningHub (GPT Image 2) pour vos bannières.",
+      "images": [
+        {
+          "file": "assets/images/banks/generes/bannieres/banniere-ville-dusk.jpg",
+          "alt": "Bannière ville au crépuscule",
+          "slot": "banner"
+        },
+        {
+          "file": "assets/images/banks/generes/bannieres/banniere-campagne-verte.jpg",
+          "alt": "Bannière campagne verdoyante",
+          "slot": "banner"
+        },
+        {
+          "file": "assets/images/banks/generes/bannieres/banniere-bureau-moderne.jpg",
+          "alt": "Bannière bureau moderne",
+          "slot": "banner"
+        },
+        {
+          "file": "assets/images/banks/generes/bannieres/banniere-lac-montagnes.jpg",
+          "alt": "Bannière lac et montagnes au lever du soleil",
+          "slot": "banner"
+        },
+        {
+          "file": "assets/images/banks/generes/bannieres/banniere-plage-tropicale.jpg",
+          "alt": "Bannière plage tropicale",
+          "slot": "banner"
+        },
+        {
+          "file": "assets/images/banks/generes/bannieres/banniere-fete-confettis.jpg",
+          "alt": "Bannière fête et confettis",
+          "slot": "banner"
+        }
+      ]
+    },
+    {
+      "id": "generes-fonds",
+      "label": "Fonds générés",
+      "description": "Fonds abstraits générés par RunningHub (GPT Image 2) pour bannières et illustrations.",
+      "images": [
+        {
+          "file": "assets/images/banks/generes/fonds/fond-vagues-bleu.jpg",
+          "alt": "Fond vagues bleues",
+          "slot": "banner"
+        },
+        {
+          "file": "assets/images/banks/generes/fonds/fond-formes-pastel.jpg",
+          "alt": "Fond formes pastel",
+          "slot": "banner"
+        },
+        {
+          "file": "assets/images/banks/generes/fonds/fond-aurore-boreale.jpg",
+          "alt": "Fond aurore boréale",
+          "slot": "banner"
+        },
+        {
+          "file": "assets/images/banks/generes/fonds/fond-particules-nuit.jpg",
+          "alt": "Fond particules nuit",
+          "slot": "banner"
+        },
+        {
+          "file": "assets/images/banks/generes/fonds/fond-marbre-or.jpg",
+          "alt": "Fond marbre or",
+          "slot": "banner"
+        },
+        {
+          "file": "assets/images/banks/generes/fonds/fond-mesh-coral.jpg",
+          "alt": "Fond mesh corail",
+          "slot": "banner"
+        },
+        {
+          "file": "assets/images/banks/generes/fonds/fond-rayures-rose.jpg",
+          "alt": "Fond rayures rose et violet",
+          "slot": "banner"
+        },
+        {
+          "file": "assets/images/banks/generes/fonds/fond-ondes-gris.jpg",
+          "alt": "Fond ondes gris et bleu",
+          "slot": "banner"
+        }
+      ]
     }
   ]
 }
