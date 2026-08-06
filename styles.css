@@ -265,6 +265,38 @@ button { font-family: inherit; }
 .bank-tab:hover { border-color: var(--c-border-strong); color: var(--c-text); }
 .bank-tab.is-active { background: var(--c-accent); border-color: var(--c-accent); color: #fff; }
 
+.bank-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+}
+.bank-filter {
+  flex: 1 1 170px;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+.bank-filter label {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--c-text-soft);
+  white-space: nowrap;
+}
+.bank-filter select {
+  flex: 1 1 auto;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--c-text);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-sm);
+  padding: 0.35rem 0.5rem;
+}
+
 .bank-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

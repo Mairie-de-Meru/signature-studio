@@ -40,15 +40,20 @@ signature-studio/
         ├── logos/      Logos de démonstration
         ├── bannieres/  Bannières génériques
         ├── social/     Icônes sociales de référence
-        └── banks/      Banques libres récupérées (mairies, nature, fonds, avatars…)
+        └── banks/      Banques d'images (nature, fonds, bureaux, avatars, générées…)
 ```
 
 ## ✨ Fonctionnalités
 
 - **Banque d'images libres** : avatars, logos, bannières, fonds, nature, etc.
   (Wikipédia Commons + DiceBear), hébergées localement.
+- **Banque organisée** : deux onglets — « Générique » et « Import » — avec un tri
+  par type d'image (bannière, logo, icône, avatar…) et par catégorie (Nature,
+  Bureaux, Fonds abstraits…).
 - **Application directe au clic** : une image de la banque est placée
   automatiquement (photo / logo / bannière) sans choisir l'emplacement.
+- **Taille des images réglable** : photo, logo, icônes et bannière (toutes les
+  bannières partagent le même format par défaut).
 - **Coloriser un avatar** : sélectionnez un avatar illustré et changez sa
   couleur avec le sélecteur (s'applique aux avatars monochromes).
 - **Texte sur la bannière** : incrustez un titre + sous-titre dans la bannière

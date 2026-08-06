@@ -6,7 +6,7 @@
   <title>Signature Studio — Créateur de signatures e-mail</title>
   <meta name="description" content="Concevez et exportez des signatures e-mail professionnelles. Application 100% statique, sans serveur ni installation.">
   <meta name="theme-color" content="#2358c7">
-  <link rel="stylesheet" href="styles.css?v=20260806-1">
+  <link rel="stylesheet" href="styles.css?v=20260806-2">
 </head>
 <body>
 
@@ -48,6 +48,26 @@
       <h3 class="subhead">Banque d'images</h3>
       <p class="hint">Cliquez sur une image pour la prévisualiser.</p>
       <nav id="bank-tabs" class="bank-tabs" aria-label="Catégories d'images"></nav>
+      <div class="bank-filters">
+        <div class="bank-filter">
+          <label for="bank-type-filter">Type d'image</label>
+          <select id="bank-type-filter">
+            <option value="all">Tous les types</option>
+            <option value="banner">Bannière</option>
+            <option value="logo">Logo</option>
+            <option value="icone">Icône</option>
+            <option value="avatar">Avatar</option>
+            <option value="photo">Photo</option>
+            <option value="autre">Autre</option>
+          </select>
+        </div>
+        <div class="bank-filter">
+          <label for="bank-cat-filter">Catégorie</label>
+          <select id="bank-cat-filter">
+            <option value="all">Toutes les catégories</option>
+          </select>
+        </div>
+      </div>
       <div id="bank-grid" class="bank-grid" aria-live="polite"></div>
 
       <div class="bank-import">
@@ -300,6 +320,11 @@
             <output for="s-logoSize" id="out-logoSize">100px</output>
           </div>
           <div class="field-row range-row">
+            <label for="s-bannerSize">Bannière</label>
+            <input type="range" id="s-bannerSize" data-style="bannerSize" min="240" max="640" step="8" title="Toutes les bannières gardent le même format (largeur × hauteur).">
+            <output for="s-bannerSize" id="out-bannerSize">480px</output>
+          </div>
+          <div class="field-row range-row">
             <label for="s-iconSize">Icônes</label>
             <input type="range" id="s-iconSize" data-style="iconSize" min="16" max="32" step="2">
             <output for="s-iconSize" id="out-iconSize">22px</output>
@@ -379,7 +404,7 @@
     <img id="zoom-img" src="" alt="">
   </div>
 
-  <script src="assets/images-data.js?v=20260806-1"></script>
-  <script src="app.js?v=20260806-1"></script>
+  <script src="assets/images-data.js?v=20260806-2"></script>
+  <script src="app.js?v=20260806-2"></script>
 </body>
 </html>

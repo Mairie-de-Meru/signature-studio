@@ -47,7 +47,7 @@ const DEFAULT_STATE = {
     font: "Arial, Helvetica, sans-serif",
     fontSize: 13, nameSize: 17,
     primary: "#1a5fb4", secondary: "#5b6e84", text: "#333333",
-    align: "left", spacing: 6, photoSize: 72, logoSize: 100, iconSize: 22,
+    align: "left", spacing: 6, photoSize: 72, logoSize: 100, bannerSize: 480, iconSize: 22,
     bannerTextColor: "#ffffff", bannerTextSize: 22, bannerPos: "center", bannerAlign: "center",
     avatarColor: "#2358c7"
   }
@@ -196,8 +196,10 @@ function buildParts(st, exportMode) {
     ? `<img${at("logo")} src="${esc(img("logo"))}" alt="Logo ${esc(d.company) || "entreprise"}" width="${ls}" style="display:block;width:${ls}px;height:auto;max-width:180px;">`
     : "";
   const bannerSrc = getBannerSrc(exportMode);
+  const bs = Number(s.bannerSize) || 480;
+  const bh = Math.max(40, Math.round(bs * 0.25));
   parts.banner = (v.banner && bannerSrc)
-    ? `<img${at("banner")} src="${esc(bannerSrc)}" alt="Bannière ${esc(d.company) || "promotionnelle"}" width="480" style="display:block;width:100%;max-width:480px;height:auto;border-radius:4px;">`
+    ? `<img${at("banner")} src="${esc(bannerSrc)}" alt="Bannière ${esc(d.company) || "promotionnelle"}" width="${bs}" height="${bh}" style="display:block;width:${bs}px;height:${bh}px;object-fit:cover;border-radius:4px;">`
     : "";
 
   parts.legal = (v.legal && d.legal)
@@ -276,9 +278,10 @@ ${p.legal ? `<div style="padding-top:${pad + 2}px;">${p.legal}</div>` : ""}
     label: "Avec bannière",
     render(p) {
       const { s } = p, pad = s.spacing;
+      const maxW = Math.max(480, Number(s.bannerSize) || 480);
       const left = p.photo
         ? `<td valign="top" style="padding:0 ${pad + 8}px 0 0;">${p.photo}</td>` : "";
-      return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;max-width:480px;">
+      return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;max-width:${maxW}px;">
 ${p.logo ? `<tr><td style="padding-bottom:${pad + 2}px;">${p.logo}</td></tr>` : ""}
 <tr><td><table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>
 ${left}<td valign="top" style="text-align:${s.align};">
@@ -432,15 +435,16 @@ async function updateBannerComposite() {
   bannerComposite = null;
   if (!hasText) { renderPreview(); return; }
   const base = state.data.banner ? resolveImgUrl(state.data.banner) : null;
-  const W = 480;
-  let H = 120;
+  // Toutes les bannières partagent le même format 4:1 (comme le fond
+  // « Abstract Blue Background » 960x240), quelle que soit l'image source.
+  const W = Number(state.style.bannerSize) || 480;
+  const H = Math.max(40, Math.round(W * 0.25));
   let im = null;
   if (base) {
     try { im = await loadImage(base); }
     catch { im = null; }
   }
   const canvas = document.createElement("canvas");
-  if (im) H = Math.max(60, Math.round(W * im.naturalHeight / im.naturalWidth));
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext("2d");
@@ -644,81 +648,141 @@ function showModal(title, message, onConfirm) {
 }
 
 let imageBank = { categories: [] };
-let currentCategory = "entreprise";
+let currentGroup = "generique";
+let bankTypeFilter = "all";
+let bankCatFilter = "all";
+
+const IMAGE_TYPE_LABELS = {
+  banner: "Bannière",
+  logo: "Logo",
+  icone: "Icône",
+  avatar: "Avatar",
+  photo: "Photo",
+  autre: "Autre"
+};
 
 async function loadImageBank() {
   try {
-    const res = await fetch(BASE_URL + "assets/images.json?v=20260806-1");
+    const res = await fetch(BASE_URL + "assets/images.json?v=20260806-2");
     if (!res.ok) throw new Error("HTTP " + res.status);
     imageBank = await res.json();
   } catch {
     imageBank = window.IMAGE_BANK || { categories: [] };
   }
   renderBankTabs();
+  renderBankFilters();
   renderBankGrid();
 }
 
-function getBankCategories() {
-  const cats = imageBank.categories.slice();
-  cats.push({
-    id: "imports",
-    label: "Mes imports",
-    description: "Images importées depuis votre ordinateur.",
-    images: importedImages
-  });
-  return cats;
+function getBankGroups() {
+  return [
+    {
+      id: "generique",
+      label: "Générique",
+      description: "Toutes les images proposées par le studio.",
+      categories: imageBank.categories
+    },
+    {
+      id: "imports",
+      label: "Import",
+      description: "Images importées depuis votre ordinateur.",
+      categories: [{ id: "imports", label: "Imports", images: importedImages }]
+    }
+  ];
+}
+
+function imageType(img, catId) {
+  if (img && img.type) return img.type;
+  const f = ((img && (img.file || img.name)) || "").toLowerCase();
+  const n = ((img && img.alt) || "").toLowerCase();
+  const hay = f + " " + n;
+  if (/banniere|banner|fond|fonds|header|paysage/.test(hay)) return "banner";
+  if (/avatar|photo|profil|portrait/.test(hay)) return "avatar";
+  if (/logo/.test(hay)) return "logo";
+  if (/icone|icon|social|picto|symbole/.test(hay)) return "icone";
+  if (catId === "social") return "icone";
+  return "autre";
 }
 
 function renderBankTabs() {
   const nav = $("#bank-tabs");
   nav.innerHTML = "";
-  for (const cat of getBankCategories()) {
+  for (const g of getBankGroups()) {
     const b = document.createElement("button");
     b.type = "button";
-    b.className = "bank-tab" + (cat.id === currentCategory ? " is-active" : "");
-    b.textContent = cat.label;
-    b.title = cat.description || "";
+    b.className = "bank-tab" + (g.id === currentGroup ? " is-active" : "");
+    b.textContent = g.label;
+    b.title = g.description || "";
     b.addEventListener("click", () => {
-      currentCategory = cat.id;
+      currentGroup = g.id;
+      bankCatFilter = "all";
       renderBankTabs();
+      renderBankFilters();
       renderBankGrid();
     });
     nav.appendChild(b);
   }
 }
 
+function renderBankFilters() {
+  const group = getBankGroups().find((g) => g.id === currentGroup);
+  const catSel = $("#bank-cat-filter");
+  if (!catSel) return;
+  const previous = bankCatFilter;
+  catSel.innerHTML = `<option value="all">Toutes les catégories</option>`;
+  for (const cat of (group ? group.categories : [])) {
+    if (!cat.images || !cat.images.length) continue;
+    const opt = document.createElement("option");
+    opt.value = cat.id;
+    opt.textContent = cat.label;
+    catSel.appendChild(opt);
+  }
+  const stillValid = [...catSel.options].some((o) => o.value === previous);
+  bankCatFilter = stillValid ? previous : "all";
+  catSel.value = bankCatFilter;
+  const typeSel = $("#bank-type-filter");
+  if (typeSel) typeSel.value = bankTypeFilter;
+}
+
 function renderBankGrid() {
   const grid = $("#bank-grid");
   grid.innerHTML = "";
-  const cat = getBankCategories().find((c) => c.id === currentCategory);
-  if (!cat || !cat.images.length) {
-    grid.innerHTML = `<p class="bank-empty">Aucune image dans cette catégorie.</p>`;
+  const group = getBankGroups().find((g) => g.id === currentGroup);
+  const items = [];
+  for (const cat of (group ? group.categories : [])) {
+    if (bankCatFilter !== "all" && cat.id !== bankCatFilter) continue;
+    for (const img of cat.images || []) {
+      const t = imageType(img, cat.id);
+      if (bankTypeFilter !== "all" && t !== bankTypeFilter) continue;
+      items.push({ img, catId: cat.id });
+    }
+  }
+  if (!items.length) {
+    grid.innerHTML = `<p class="bank-empty">Aucune image ne correspond à ces filtres.</p>`;
     return;
   }
-  for (const img of cat.images) {
+  for (const { img, catId } of items) {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "bank-item";
     b.title = img.alt || "";
     b.innerHTML = `<img src="${esc(img.file)}" alt="${esc(img.alt || "")}" loading="lazy">`;
-    b.addEventListener("click", () => applyBankImageDirect(currentCategory, img, b));
+    b.addEventListener("click", () => applyBankImageDirect(img, catId, b));
     grid.appendChild(b);
   }
 }
 
-function slotForImage(catId, img) {
+function slotForImage(img, catId) {
   if (img.slot) return img.slot;
-  const f = (img.file || "").toLowerCase();
-  if (f.includes("banniere") || f.includes("bannière")) return "banner";
-  if (catId === "avatars" || f.includes("avatar")) return "photo";
-  if (catId === "logos" || f.includes("logo")) return "logo";
-  if (catId === "entreprise") return "logo";
-  if (catId === "social") return null;
+  const t = imageType(img, catId);
+  if (t === "banner") return "banner";
+  if (t === "avatar" || t === "photo") return "photo";
+  if (t === "icone") return null;
   return "logo";
 }
 
-function applyBankImageDirect(catId, img, btn) {
-  const slot = slotForImage(catId, img);
+function applyBankImageDirect(img, catId, btn) {
+  const slot = slotForImage(img, catId);
   if (!slot) {
     showToast("Ces icônes ne sont pas placées comme image dans la signature.", "info");
     return;
@@ -755,13 +819,17 @@ function handleImportFile(file) {
   const reader = new FileReader();
   reader.onload = () => {
     const entry = { file: reader.result, alt: file.name, name: file.name };
+    entry.type = imageType(entry, "imports");
     importedImages.push(entry);
     saveImports();
-    currentCategory = "imports";
+    currentGroup = "imports";
+    bankCatFilter = "all";
+    bankTypeFilter = "all";
     renderBankTabs();
+    renderBankFilters();
     renderBankGrid();
-    applyBankImageDirect("imports", entry);
-    showToast("Image importée et appliquée comme logo.", "success");
+    applyBankImageDirect(entry, "imports");
+    showToast("Image importée.", "success");
   };
   reader.onerror = () => showToast("Impossible de lire ce fichier.", "error");
   reader.readAsDataURL(file);
@@ -883,11 +951,20 @@ function bindEvents() {
   $$("[data-style]").forEach((el) => {
     el.addEventListener("input", () => {
       updateRangeOutput(el);
-      const num = ["fontSize", "nameSize", "spacing", "photoSize", "logoSize", "iconSize"];
+      const num = ["fontSize", "nameSize", "spacing", "photoSize", "logoSize", "bannerSize", "iconSize"];
       updateState((s) => {
         s.style[el.dataset.style] = num.includes(el.dataset.style) ? Number(el.value) : el.value;
       });
     });
+  });
+
+  $("#bank-type-filter").addEventListener("change", (e) => {
+    bankTypeFilter = e.target.value;
+    renderBankGrid();
+  });
+  $("#bank-cat-filter").addEventListener("change", (e) => {
+    bankCatFilter = e.target.value;
+    renderBankGrid();
   });
 
   $("#preview-signature").addEventListener("click", (e) => {
